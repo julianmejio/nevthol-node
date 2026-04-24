@@ -36,3 +36,7 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# Package contracts
+/packages/contracts/src/generated/pb/*
+!/packages/contracts/src/generated/pb/.gitkeep

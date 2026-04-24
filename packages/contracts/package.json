@@ -1,0 +1,39 @@
+{
+  "name": "@repo/contracts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Contracts used across the project",
+  "type": "module",
+  "exports": {
+    "./pb/*": {
+      "types": "./src/generated/pb/*",
+      "default": "./dist/generated/pb/*"
+    },
+    "./*": {
+      "types": "./src/*",
+      "default": "./dist/*"
+    }
+  },
+  "scripts": {
+    "generate": "buf generate",
+    "lint": "buf lint",
+    "check-types": "tsc --noEmit",
+    "build": "buf build && tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.12.0",
+    "@bufbuild/protovalidate": "^1.2.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@bufbuild/buf": "^1.68.4",
+    "@bufbuild/protoc-gen-es": "^2.12.0",
+    "@tsconfig/node-ts": "^23.6.4",
+    "@tsconfig/node24": "^24.0.4",
+    "@types/node": "^22.15.3",
+    "typescript": "^6.0.3"
+  }
+}
