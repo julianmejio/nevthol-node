@@ -1,22 +1,21 @@
 import uWS from 'uWebSockets.js';
-import fs from 'fs';
+import { PlayerPositionSchema } from "@repo/contracts/pb/player_position/v1/player_position_pb.js";
+import { fromBinary } from "@bufbuild/protobuf";
 
-console.log("1");
-
-// Use the H3App for QUIC/HTTP3
-uWS.SSLApp({
-    key_file_name: './src/localhost+2-key.pem',
-    cert_file_name: './src/localhost+2.pem'
-}).get('/*', (res, req) => {
-    console.log('req', req);
-    // res.cork ensures the small response is packed into one packet
-    res.cork(() => {
-        res.end('OK');
-    });
-}).listen(9001, (token) => {
-    if (token) {
-        console.log('🚀 H3 Server listening on port 9001');
-    } else {
-        console.log('❌ Failed to listen. Check certs and UDP permissions.');
+uWS.App().ws('/*', {
+    compression: uWS.DISABLED,
+    maxPayloadLength: 2 * 1024,
+    idleTimeout: 10,
+    message: (ws, message, isBinary) => {
+        if(!isBinary) {
+            console.error('Receive non-binary message. Discarding…');
+            return;
+        }
+        const bytes = new Uint8Array(message);
+        const position = fromBinary(PlayerPositionSchema, bytes);
+    }
+}).listen(9001, token => {
+    if(token) {
+        console.log('Listening…');
     }
 });
