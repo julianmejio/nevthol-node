@@ -4,8 +4,8 @@
     "compilerOptions": {
         "module": "ESNext",
         "moduleResolution": "Bundler",
+        "types": ["node"],
         "allowJs": true,
-        "noEmit": true,
         "erasableSyntaxOnly": false
     }
 }

@@ -1,28 +1,22 @@
-import uWS from "uWebSockets.js";
-import { LISTEN_PORT } from "./config";
-import { PlayerPositionSchema } from "@repo/contracts/pb/player_position/v1/player_position_pb.js";
-import { fromBinary } from "@bufbuild/protobuf";
+import { LISTEN_PORT } from "./config.js";
+import { createServer } from "./server.js";
+import process from "node:process";
+import { us_listen_socket_close } from "uWebSockets.js";
 
-uWS
-  .App()
-  .ws("/*", {
-    compression: uWS.DISABLED,
-    maxPayloadLength: 2 * 1024,
-    idleTimeout: 10,
-    message: (ws, message, isBinary) => {
-      if (!isBinary) {
-        console.error(
-          "Discarded non-binary message. Clients must send binary PB GEO signals for being processed",
-        );
-        return;
-      }
-      const messagePayload = new Uint8Array(message);
-      const playerPosition = fromBinary(PlayerPositionSchema, messagePayload);
-      console.log("Received GEO position", playerPosition);
-    },
-  })
-  .listen(LISTEN_PORT, (token) => {
-    if (token) {
-      console.log("GEO transponder started and listening on port", LISTEN_PORT);
-    }
-  });
+const bootstrap = async (): Promise<void> => {
+  try {
+    const { token } = await createServer(LISTEN_PORT);
+    console.log("GEO transponder is listening on port ", LISTEN_PORT);
+
+    process.on("SIGTERM", () => {
+      console.log("Closing GEO transponder...");
+      us_listen_socket_close(token);
+      process.exit(0);
+    });
+  } catch (error) {
+    console.error("Failed to start GEO transponder:", error);
+    process.exit(1);
+  }
+};
+
+bootstrap();
