@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "[ -f .env ] && tsx --env-file=.env --watch src/index.ts || tsx --watch src/index.ts",
-    "test": "tsx --watch src/test.ts",
+    "test": "vitest run .",
     "check-types": "tsc --noEmit",
     "lint": "eslint --max-warnings 0"
   },
@@ -21,7 +21,8 @@
     "@types/node": "^22.15.3",
     "eslint": "^9.39.1",
     "tsx": "^4.21.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.5"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.12.0",

@@ -14,7 +14,7 @@ export const createServer = (
     compression: uWS.DISABLED,
     maxPayloadLength: 2 * 1024,
     idleTimeout: 10,
-    message: (ws, message, isBinary) => {
+    message: (_ws, message, isBinary) => {
       if (!isBinary) {
         console.error(
           "Discarded non-binary message. Clients must send binary PB GEO signals for being processed",
