@@ -6,7 +6,7 @@
   ],
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDirs": ["src", "tests"],
     "strictNullChecks": true
   },
   "include": ["src/**/*", "tests/**/*"],

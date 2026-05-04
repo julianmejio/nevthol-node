@@ -19,4 +19,4 @@ const bootstrap = async (): Promise<void> => {
   }
 };
 
-bootstrap();
+await bootstrap();
