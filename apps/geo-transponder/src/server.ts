@@ -22,8 +22,16 @@ export const createServer = (
         return;
       }
       const messagePayload = new Uint8Array(message);
-      const playerPosition = fromBinary(PlayerPositionSchema, messagePayload);
-      console.log("Received GEO position", playerPosition);
+      try {
+        const playerPosition = fromBinary(PlayerPositionSchema, messagePayload);
+        console.log("Received GEO position", playerPosition);
+      } catch (error) {
+        console.error(
+          "Discarded malformed message. Client must send binary and well formed PB GEO signals for being processed",
+          error,
+        );
+        return;
+      }
     },
   });
   return new Promise((resolve) => {
