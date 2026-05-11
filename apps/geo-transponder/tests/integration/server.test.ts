@@ -11,13 +11,25 @@ import { type us_listen_socket, us_listen_socket_close } from "uWebSockets.js";
 import { createServer } from "../../src/server";
 import { PlayerPositionSchema } from "@repo/contracts/pb/player_position/v1/player_position_pb.js";
 import { create, toBinary } from "@bufbuild/protobuf";
+import { createKafkaProvider, type MessagingProvider } from "../../src/kafka";
+import { Violation } from "@bufbuild/protovalidate";
 
 describe("GEO transponder", () => {
   let serverToken: us_listen_socket | null = null;
+  let messenger: MessagingProvider;
   const LISTEN_PORT = 9001;
 
   beforeAll(async () => {
-    const { token } = await createServer(LISTEN_PORT);
+    messenger = createKafkaProvider({
+      clientId: "geo-transponder-test",
+      brokers: [process.env.KAFKA_BROKERS!],
+    });
+    await messenger.connect();
+    await messenger.admin().createTopics({
+      topics: [{ topic: "player-position-v1" }],
+      waitForLeaders: true,
+    });
+    const { token } = await createServer(LISTEN_PORT, messenger);
     serverToken = token;
   });
 
@@ -25,8 +37,9 @@ describe("GEO transponder", () => {
     vi.clearAllMocks();
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     vi.restoreAllMocks();
+    await messenger.disconnect();
     if (null === serverToken) {
       return;
     }
@@ -34,18 +47,20 @@ describe("GEO transponder", () => {
   });
 
   it("should log success when receiving valid data", async () => {
-    const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+    const logSpy = vi.spyOn(messenger, "sendBinary");
 
     const client = new WebSocket(`ws://localhost:${LISTEN_PORT}`);
     client.binaryType = "arraybuffer";
 
+    const validPayload = create(PlayerPositionSchema, {
+      mapId: 1,
+      x: 10000,
+      y: 100,
+      z: 100,
+    });
+
     await new Promise<void>((resolve) => {
       client.onopen = () => {
-        const validPayload = create(PlayerPositionSchema, {
-          mapId: 1,
-          lat: 100,
-          long: 100,
-        });
         client.send(toBinary(PlayerPositionSchema, validPayload));
         resolve();
       };
@@ -53,19 +68,18 @@ describe("GEO transponder", () => {
 
     await new Promise((res) => setTimeout(res, 50));
 
-    expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining("Received"),
-      expect.objectContaining({
-        mapId: 1,
-        lat: 100,
-        long: 100,
-      }),
-    );
+    expect(logSpy).toHaveBeenCalledWith("player-position-v1", [
+      {
+        value: Buffer.from(
+          new Uint8Array(toBinary(PlayerPositionSchema, validPayload)),
+        ),
+      },
+    ]);
     client.close();
   });
 
   it("should log error when receiving non-binary data", async () => {
-    const logSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const logSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     const client = new WebSocket(`ws://localhost:${LISTEN_PORT}`);
 
@@ -84,7 +98,9 @@ describe("GEO transponder", () => {
 
     await new Promise((res) => setTimeout(res, 50));
 
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining("Discarded"));
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringMatching("Message received is not binary"),
+    );
     client.close();
   });
 
@@ -98,13 +114,8 @@ describe("GEO transponder", () => {
       client.onopen = () => {
         const validPayload = create(PlayerPositionSchema, {
           mapId: 1,
-          lat: 100,
-          long: 100,
         });
         const validBinaryPayload = toBinary(PlayerPositionSchema, validPayload);
-        // Tamper payload intentionally
-        validBinaryPayload[0] = 0xff;
-        validBinaryPayload[1] = 0xff;
         client.send(validBinaryPayload);
       };
       resolve();
@@ -113,8 +124,8 @@ describe("GEO transponder", () => {
     await new Promise((res) => setTimeout(res, 50));
 
     expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining("malformed"),
-      expect.any(Error),
+      expect.stringMatching("Invalid message received"),
+      expect.any(Array<Violation>),
     );
   });
 });

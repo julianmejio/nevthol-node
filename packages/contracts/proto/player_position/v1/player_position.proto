@@ -5,7 +5,19 @@ package player_position.v1;
 import "buf/validate/validate.proto";
 
 message PlayerPosition {
-  uint32 map_id = 1 [(buf.validate.field).uint32.lte = 150];
-  double lat = 2 [(buf.validate.field).double.lte = 150];
-  double long = 3 [(buf.validate.field).double.lte = 150];
+  // Required positioning (always)
+  uint32 x = 1 [(buf.validate.field).required = true];
+  uint32 y = 2 [(buf.validate.field).required = true];
+  optional sint32 z = 3 [(buf.validate.field).required = true];
+  // Flags change often, like when the player use amount, which could
+  // changes several times in a short time
+  uint32 flags = 4;
+  // Handshake properties. Sent only at the start of the connection or
+  // when the player characters or map change
+  optional string character_name = 5;
+  optional uint32 map_id = 6;
+  optional uint32 mount_id = 7;
+  optional uint32 profession_id = 8;
+  optional uint32 race_id = 9;
+  optional uint32 specialization_id = 10;
 }
