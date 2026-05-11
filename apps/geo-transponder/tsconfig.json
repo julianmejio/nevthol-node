@@ -6,9 +6,9 @@
   ],
   "compilerOptions": {
     "outDir": "dist",
-    "rootDirs": ["src", "tests"],
+    "rootDir": "src",
     "strictNullChecks": true
   },
-  "include": ["src/**/*", "tests/**/*"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "tests"]
 }
