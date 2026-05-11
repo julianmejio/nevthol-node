@@ -28,12 +28,12 @@
     "@bufbuild/protovalidate": "^1.2.0"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
-    "@bufbuild/buf": "^1.68.4",
+    "@bufbuild/buf": "^1.69.0",
     "@bufbuild/protoc-gen-es": "^2.12.0",
+    "@repo/typescript-config": "workspace:*",
     "@tsconfig/node-ts": "^23.6.4",
     "@tsconfig/node24": "^24.0.4",
-    "@types/node": "^22.15.3",
+    "@types/node": "^22.19.19",
     "typescript": "^6.0.3"
   }
 }
