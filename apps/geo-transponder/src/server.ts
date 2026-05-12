@@ -49,7 +49,6 @@ export const createServer = (
           PlayerPositionSchema,
           fromBinary(PlayerPositionSchema, messagePayload),
         );
-        console.log(validation);
         if ("valid" != validation.kind) {
           console.error("Invalid message received", validation.violations);
           return;
