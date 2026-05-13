@@ -25,10 +25,7 @@ describe("GEO transponder", () => {
       brokers: [process.env.KAFKA_BROKERS!],
     });
     await messenger.connect();
-    await messenger.admin().createTopics({
-      topics: [{ topic: "player-position-v1" }],
-      waitForLeaders: true,
-    });
+    await messenger.createTopic({ name: "player-position-v1" });
     const { token } = await createServer(LISTEN_PORT, messenger);
     serverToken = token;
   });

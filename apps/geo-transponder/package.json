@@ -9,7 +9,7 @@
     "test": "vitest run .",
     "check-types": "tsc --noEmit",
     "lint": "eslint --max-warnings 0",
-    "tesst": "tsx src/test.ts"
+    "tesst": "tsx src/test-consumer.ts"
   },
   "keywords": [],
   "author": "",
@@ -29,6 +29,7 @@
     "vitest": "^4.1.6"
   },
   "dependencies": {
+    "@repo/utils": "workspace:*",
     "@bufbuild/protobuf": "^2.12.0",
     "@bufbuild/protovalidate": "^1.2.0",
     "@repo/contracts": "workspace:*",

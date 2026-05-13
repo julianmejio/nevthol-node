@@ -1,0 +1,33 @@
+{
+  "name": "@repo/utils",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "check-types": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "exports": {
+    "./bitflag": {
+      "types": "./src/bitflag.ts",
+      "default": "./dist/bitflag.js"
+    },
+    "./*": {
+      "types": "./src/*",
+      "default": "./dist/*"
+    }
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@tsconfig/node-ts": "^23.6.4",
+    "@tsconfig/node24": "^24.0.4",
+    "@types/node": "^22.19.19",
+    "eslint": "^9.39.4",
+    "typescript": "^6.0.3"
+  }
+}

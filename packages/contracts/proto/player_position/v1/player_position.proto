@@ -4,6 +4,14 @@ package player_position.v1;
 
 import "buf/validate/validate.proto";
 
+// Describes the attributes that a player position could have
+enum PlayerPositionFlags {
+  PLAYER_POSITION_FLAGS_UNSPECIFIED = 0;
+  PLAYER_POSITION_FLAGS_IN_COMBAT = 1;
+  PLAYER_POSITION_FLAGS_COMMANDER = 2;
+}
+
+// Represents the status and position of a player in a certain point in time
 message PlayerPosition {
   // Required positioning (always)
   uint32 x = 1 [(buf.validate.field).required = true];
