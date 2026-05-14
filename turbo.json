@@ -22,6 +22,7 @@
       "persistent": true
     },
     "test": {
+      "dependsOn": ["^test"],
       "env": ["KAFKA_BROKERS"]
     }
   }

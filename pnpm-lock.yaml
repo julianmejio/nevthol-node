@@ -261,6 +261,9 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      '@repo/vitest-config':
+        specifier: workspace:*
+        version: link:../vitest-config
       '@tsconfig/node-ts':
         specifier: ^23.6.4
         version: 23.6.4

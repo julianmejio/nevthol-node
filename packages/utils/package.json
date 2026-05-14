@@ -5,6 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test": "vitest run .",
     "build": "tsc",
     "check-types": "tsc --noEmit"
   },
@@ -27,6 +28,7 @@
     "@tsconfig/node-ts": "^23.6.4",
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^22.19.19",
+    "@repo/vitest-config": "workspace:*",
     "eslint": "^9.39.4",
     "typescript": "^6.0.3",
     "vitest": "^4.1.6"
