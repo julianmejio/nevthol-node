@@ -36,7 +36,7 @@
     "@repo/vitest-config": "workspace:*",
     "@repo/utils": "workspace:*",
     "kafkajs": "^2.2.4",
-    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.65.0",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.67.0",
     "zod": "^4.4.3"
   }
 }
