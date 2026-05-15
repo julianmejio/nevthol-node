@@ -11,22 +11,27 @@ import { type us_listen_socket, us_listen_socket_close } from "uWebSockets.js";
 import { createServer } from "../../src/server";
 import { PlayerPositionSchema } from "@repo/contracts/pb/player_position/v1/player_position_pb.js";
 import { create, toBinary } from "@bufbuild/protobuf";
-import { createKafkaProvider, type MessagingProvider } from "../../src/kafka";
 import { Violation } from "@bufbuild/protovalidate";
+import { type IMessagePublisher } from "@repo/messaging/message-broker.js";
+import { createKafkaPublisher } from "@repo/kafka-adapter";
+import { type IInitializable } from "@repo/core/lifecycle.js";
 
 describe("GEO transponder", () => {
   let serverToken: us_listen_socket | null = null;
-  let messenger: MessagingProvider;
+  let messenger: IInitializable & IMessagePublisher;
   const LISTEN_PORT = 9001;
 
   beforeAll(async () => {
-    messenger = createKafkaProvider({
+    messenger = createKafkaPublisher({
       clientId: "geo-transponder-test",
       brokers: [process.env.KAFKA_BROKERS!],
     });
     await messenger.connect();
-    await messenger.createTopic({ name: "player-position-v1" });
-    const { token } = await createServer(LISTEN_PORT, messenger);
+    const { token } = await createServer({
+      listeningPort: LISTEN_PORT,
+      messenger,
+      topicName: "player-position-v1",
+    });
     serverToken = token;
   });
 
@@ -44,7 +49,7 @@ describe("GEO transponder", () => {
   });
 
   it("should log success when receiving valid data", async () => {
-    const logSpy = vi.spyOn(messenger, "sendBinary");
+    const logSpy = vi.spyOn(messenger, "publish");
 
     const client = new WebSocket(`ws://localhost:${LISTEN_PORT}`);
     client.binaryType = "arraybuffer";
@@ -65,13 +70,12 @@ describe("GEO transponder", () => {
 
     await new Promise((res) => setTimeout(res, 50));
 
-    expect(logSpy).toHaveBeenCalledWith("player-position-v1", [
-      {
-        value: Buffer.from(
-          new Uint8Array(toBinary(PlayerPositionSchema, validPayload)),
-        ),
-      },
-    ]);
+    expect(logSpy).toHaveBeenCalledWith({
+      topic: "player-position-v1",
+      message: Buffer.from(
+        new Uint8Array(toBinary(PlayerPositionSchema, validPayload)),
+      ),
+    });
     client.close();
   });
 

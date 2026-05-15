@@ -1,0 +1,30 @@
+{
+  "name": "@repo/core",
+  "type": "module",
+  "private": true,
+  "description": "",
+  "exports": {
+
+    "./*": {
+      "types": "./src/*",
+      "default": "./dist/*"
+    }
+  },
+  "scripts": {
+    "build": "tsc --emitDeclarationOnly",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint --max-warnings 0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@repo/vitest-config": "workspace:*",
+    "@tsconfig/node-ts": "^23.6.4",
+    "@tsconfig/node24": "^24.0.4",
+    "eslint": "^9.39.4",
+    "typescript": "^6.0.3"
+  }
+}

@@ -66,6 +66,9 @@ importers:
       '@repo/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@repo/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@repo/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -85,6 +88,12 @@ importers:
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@repo/kafka-adapter':
+        specifier: workspace:*
+        version: link:../../packages/kafka-adapter
+      '@repo/messaging':
+        specifier: workspace:*
+        version: link:../../packages/messaging
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
@@ -184,6 +193,30 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
 
+  packages/core:
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@repo/vitest-config':
+        specifier: workspace:*
+        version: link:../vitest-config
+      '@tsconfig/node-ts':
+        specifier: ^23.6.4
+        version: 23.6.4
+      '@tsconfig/node24':
+        specifier: ^24.0.4
+        version: 24.0.4
+      eslint:
+        specifier: ^9.39.4
+        version: 9.39.4
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   packages/eslint-config:
     devDependencies:
       '@eslint/js':
@@ -219,6 +252,77 @@ importers:
       typescript-eslint:
         specifier: ^8.59.3
         version: 8.59.3(eslint@9.39.4)(typescript@5.9.3)
+
+  packages/kafka-adapter:
+    dependencies:
+      '@repo/core':
+        specifier: workspace:*
+        version: link:../core
+      '@repo/messaging':
+        specifier: workspace:*
+        version: link:../messaging
+      kafkajs:
+        specifier: ^2.2.4
+        version: 2.2.4
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@repo/vitest-config':
+        specifier: workspace:*
+        version: link:../vitest-config
+      '@tsconfig/node-ts':
+        specifier: ^23.6.4
+        version: 23.6.4
+      '@tsconfig/node24':
+        specifier: ^24.0.4
+        version: 24.0.4
+      '@types/node':
+        specifier: ^22.19.19
+        version: 22.19.19
+      eslint:
+        specifier: ^9.39.4
+        version: 9.39.4
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.1.6
+        version: 4.1.6(@types/node@22.19.19)(vite@8.0.10(@types/node@22.19.19)(esbuild@0.28.0)(tsx@4.21.0)(yaml@2.9.0))
+
+  packages/messaging:
+    dependencies:
+      '@repo/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@repo/vitest-config':
+        specifier: workspace:*
+        version: link:../vitest-config
+      '@tsconfig/node-ts':
+        specifier: ^23.6.4
+        version: 23.6.4
+      '@tsconfig/node24':
+        specifier: ^24.0.4
+        version: 24.0.4
+      '@types/node':
+        specifier: ^22.19.19
+        version: 22.19.19
+      eslint:
+        specifier: ^9.39.4
+        version: 9.39.4
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
 
   packages/typescript-config: {}
 

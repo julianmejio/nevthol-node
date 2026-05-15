@@ -6,31 +6,41 @@ import uWS, {
 import { PlayerPositionSchema } from "@repo/contracts/pb/player_position/v1/player_position_pb.js";
 import { fromBinary } from "@bufbuild/protobuf";
 import { createValidator } from "@bufbuild/protovalidate";
-import type { MessagingProvider } from "./kafka";
+import type { IMessagePublisher } from "@repo/messaging/message-broker.js";
+import {
+  LISTEN_PORT,
+  MAX_BUFFERED_AMOUNT_PER_CONNECTION,
+  MAX_PAYLOAD_LENGTH,
+} from "./config";
 
 const validator = createValidator();
-
-const MAX_PAYLOAD_LENGTH = 2 * 1024;
-const MAX_BUFFERED_AMOUNT_PER_CONNECTION = MAX_PAYLOAD_LENGTH * 20;
-const KAFKA_TOPIC = "player-position-v1";
-
-let messageCount: number = 0;
 
 export interface ServerInstance {
   app: TemplatedApp;
   token: us_listen_socket;
 }
 
-export const createServer = (
-  listeningPort: number,
-  messenger: MessagingProvider,
-): Promise<ServerInstance> => {
+export interface ServerParams {
+  listeningPort?: number;
+  messenger: IMessagePublisher;
+  maxPayloadLength?: number;
+  maxBufferedAmountPerConnection?: number;
+  topicName: string;
+}
+
+export const createServer = ({
+  listeningPort = LISTEN_PORT,
+  messenger,
+  maxPayloadLength = MAX_PAYLOAD_LENGTH,
+  maxBufferedAmountPerConnection = MAX_BUFFERED_AMOUNT_PER_CONNECTION,
+  topicName,
+}: ServerParams): Promise<ServerInstance> => {
   const app = uWS.App().ws("/*", {
     compression: uWS.DISABLED,
-    maxPayloadLength: MAX_PAYLOAD_LENGTH,
+    maxPayloadLength: maxPayloadLength,
     message: (ws: WebSocket<never>, message, isBinary) => {
       // Backpressure control: buffered amount of data
-      if (ws.getBufferedAmount() > MAX_BUFFERED_AMOUNT_PER_CONNECTION) {
+      if (ws.getBufferedAmount() > maxBufferedAmountPerConnection) {
         console.warn(
           "Max buffered amount limit per connection reached. Connection will be closed",
         );
@@ -55,17 +65,10 @@ export const createServer = (
         }
         // All fine, send message to Kafka
         messenger
-          .sendBinary(KAFKA_TOPIC, [
-            {
-              value: Buffer.from(messagePayload),
-            },
-          ])
+          .publish({ topic: topicName, message: Buffer.from(messagePayload) })
           .catch((err) => {
-            console.error("[KAFKA] Error caught:", err);
+            console.error("[IMessagePublisher] Error caught:", err);
             ws.end(1011, "Error in messenger upstream");
-          })
-          .finally(() => {
-            messageCount++;
           });
       } catch (error) {
         console.error("Error when trying to process a message", error);
@@ -78,10 +81,6 @@ export const createServer = (
     },
   });
   return new Promise((resolve) => {
-    setInterval(() => {
-      console.log("Messages processed per minute:", messageCount);
-      messageCount = 0;
-    }, 60000);
     app.listen(listeningPort, (token) => {
       resolve({ app, token });
     });

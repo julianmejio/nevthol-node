@@ -1,11 +1,16 @@
 {
-  "name": "@repo/utils",
-  "version": "0.0.0",
-  "type": "module",
+  "name": "@repo/messaging",
+  "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": {
+      "types": "./src/*",
+      "default": "./dist/*"
+    }
+  },
   "scripts": {
-    "test": "vitest run .",
     "build": "tsc",
     "check-types": "tsc --noEmit",
     "lint": "eslint --max-warnings 0"
@@ -13,25 +18,17 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "exports": {
-    "./bitflag": {
-      "types": "./src/bitflag.ts",
-      "default": "./dist/bitflag.js"
-    },
-    "./*": {
-      "types": "./src/*",
-      "default": "./dist/*"
-    }
+  "dependencies": {
+    "@repo/core": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@repo/vitest-config": "workspace:*",
     "@tsconfig/node-ts": "^23.6.4",
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^22.19.19",
-    "@repo/vitest-config": "workspace:*",
     "eslint": "^9.39.4",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.6"
+    "typescript": "^6.0.3"
   }
 }

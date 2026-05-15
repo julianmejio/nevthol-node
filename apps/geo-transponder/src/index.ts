@@ -1,23 +1,30 @@
-import { KAFKA_BROKERS, LISTEN_PORT } from "./config.js";
+import { LISTEN_PORT, MESSENGER_BROKER } from "./config.js";
 import { createServer } from "./server.js";
 import process from "node:process";
 import { us_listen_socket_close } from "uWebSockets.js";
-import { createKafkaProvider } from "./kafka";
+import { createKafkaPublisher } from "@repo/kafka-adapter";
+
+// Hardcoded as this is part of the internal versioning
+const topicName: string = "player-position-v1";
 
 const bootstrap = async (): Promise<void> => {
   try {
-    const messenger = createKafkaProvider({
+    const messenger = createKafkaPublisher({
       clientId: "geo-transponder",
-      brokers: [KAFKA_BROKERS],
+      brokers: [MESSENGER_BROKER],
     });
     await messenger.connect();
-    const { token } = await createServer(LISTEN_PORT, messenger);
+    const { token } = await createServer({
+      messenger,
+      topicName,
+      listeningPort: LISTEN_PORT,
+    });
     console.log("GEO transponder is listening on port ", LISTEN_PORT);
 
-    process.on("SIGTERM", () => {
+    process.on("SIGTERM", async () => {
       console.log("Closing GEO transponder...");
       us_listen_socket_close(token);
-      messenger.disconnect();
+      await messenger.disconnect();
       process.exit(0);
     });
   } catch (error) {
