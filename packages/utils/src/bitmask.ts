@@ -1,4 +1,4 @@
-interface FlagOperation {
+export interface FlagOperation {
   mask: number;
   flag: number;
 }

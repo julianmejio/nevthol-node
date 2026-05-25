@@ -1,0 +1,34 @@
+{
+  "name": "gs-broadcaster",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "[ -f .env ] && tsx --env-file=.env --watch src/index.ts || tsx --watch src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tsconfig/node-ts": "^23.6.4",
+    "@tsconfig/node24": "^24.0.4",
+    "@types/node": "^22.19.19",
+    "esbuild": "^0.28.0",
+    "eslint": "^9.39.4",
+    "testcontainers": "^11.14.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.6"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.12.0",
+    "@bufbuild/protovalidate": "^1.2.0",
+    "@repo/contracts": "workspace:*",
+    "@repo/kafka-adapter": "workspace:*",
+    "@repo/redis-adapter": "workspace:*",
+    "@repo/broadcasting": "workspace:*",
+    "@repo/messaging": "workspace:*",
+    "@repo/utils": "workspace:*",
+    "kafkajs": "^2.2.4"
+  }
+}

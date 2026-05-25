@@ -1,25 +1,20 @@
 {
-  "name": "@repo/messaging",
+  "name": "@repo/broadcasting",
   "version": "1.0.0",
-  "description": "",
-  "private": true,
   "type": "module",
+  "private": true,
   "exports": {
     "./*": {
       "types": "./src/*",
       "default": "./dist/*"
     }
   },
-  "scripts": {
-    "build": "tsc",
-    "check-types": "tsc --noEmit",
-    "lint": "eslint --max-warnings 0"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@repo/core": "workspace:*"
+    "@repo/core": "workspace:*",
+    "@repo/contracts": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

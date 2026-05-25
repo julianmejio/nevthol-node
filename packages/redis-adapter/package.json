@@ -1,11 +1,15 @@
 {
-  "name": "@repo/utils",
-  "version": "0.0.0",
+  "name": "@repo/redis-adapter",
   "type": "module",
+  "private": true,
   "description": "",
-  "main": "index.js",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
-    "test": "vitest run .",
     "build": "tsc",
     "check-types": "tsc --noEmit",
     "lint": "eslint --max-warnings 0"
@@ -13,27 +17,19 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "exports": {
-    "./bitmask": {
-      "types": "./src/bitmask.ts",
-      "default": "./dist/bitmask.js"
-    },
-    "./coordinates": {
-      "types": "./src/coordinates.ts",
-      "default": "./dist/coordinates.js"
-    },
-    "./*": {
-      "types": "./src/*",
-      "default": "./dist/*"
-    }
+  "dependencies": {
+    "@repo/broadcasting": "workspace:*",
+    "@repo/contracts": "workspace:*",
+    "@repo/core": "workspace:*",
+    "redis": "^5.12.1"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@repo/vitest-config": "workspace:*",
     "@tsconfig/node-ts": "^23.6.4",
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^22.19.19",
-    "@repo/vitest-config": "workspace:*",
     "eslint": "^9.39.4",
     "typescript": "^6.0.3",
     "vitest": "^4.1.6"

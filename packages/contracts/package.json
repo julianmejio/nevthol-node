@@ -9,6 +9,10 @@
       "types": "./src/generated/pb/*",
       "default": "./dist/generated/pb/*"
     },
+    "./player": {
+      "types": "./src/player.ts",
+      "default": "./dist/player.js"
+    },
     "./*": {
       "types": "./src/*",
       "default": "./dist/*"
@@ -25,7 +29,8 @@
   "license": "ISC",
   "dependencies": {
     "@bufbuild/protobuf": "^2.12.0",
-    "@bufbuild/protovalidate": "^1.2.0"
+    "@bufbuild/protovalidate": "^1.2.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.69.0",

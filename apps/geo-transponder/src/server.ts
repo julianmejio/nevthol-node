@@ -64,8 +64,10 @@ export const createServer = ({
           return;
         }
         // All fine, send message to Kafka
+        const messageBuffer = Buffer.allocUnsafe(messagePayload.byteLength);
+        messageBuffer.set(messagePayload);
         messenger
-          .publish({ topic: topicName, message: Buffer.from(messagePayload) })
+          .publish({ topic: topicName, message: messageBuffer })
           .catch((err) => {
             console.error("[IMessagePublisher] Error caught:", err);
             ws.end(1011, "Error in messenger upstream");

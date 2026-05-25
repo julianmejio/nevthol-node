@@ -4,14 +4,9 @@ export interface PublisherParams {
   message: Buffer;
 }
 
-export interface ConsumerOptions {
-  queueName?: string;
-}
-
-export interface ConsumerParams<T> {
+export interface ConsumerParams {
   topic: string;
-  onmessage: (message: T) => Promise<void>;
-  options?: ConsumerOptions;
+  onmessage: (message: Buffer) => Promise<void>;
 }
 
 export interface IMessagePublisher {
@@ -19,5 +14,5 @@ export interface IMessagePublisher {
 }
 
 export interface IMessageConsumer {
-  subscribe<T>(params: ConsumerParams<T>): Promise<void>;
+  subscribe(params: ConsumerParams): Promise<void>;
 }

@@ -1,10 +1,18 @@
-import { type IMessagePublisher } from "@repo/messaging/message-broker.js";
+import {
+  type ConsumerParams,
+  type IMessageConsumer,
+  type IMessagePublisher,
+} from "@repo/messaging/message-broker.js";
 import { type IInitializable } from "@repo/core/lifecycle.js";
 import { Kafka, type Message, Partitioners } from "kafkajs";
 
 export interface KafkaAdapterParams {
   clientId: string;
   brokers: string[];
+}
+
+export interface KafkaConsumerParams {
+  groupId: string;
 }
 
 export function createKafkaPublisher(
@@ -28,6 +36,34 @@ export function createKafkaPublisher(
         },
       ];
       await producer.send({ topic, messages });
+    },
+  };
+}
+
+export function createKafkaConsumer(
+  params: KafkaAdapterParams & KafkaConsumerParams,
+): IInitializable & IMessageConsumer {
+  const { clientId, brokers, groupId } = params;
+  const kafka = new Kafka({ clientId, brokers });
+  const consumer = kafka.consumer({ groupId });
+
+  return {
+    connect: () => consumer.connect(),
+    disconnect: () => consumer.disconnect(),
+    subscribe: async (params: ConsumerParams) => {
+      await consumer.subscribe({
+        topic: params.topic,
+        fromBeginning: true,
+      });
+
+      consumer.run({
+        eachMessage: async ({ message }) => {
+          if (null === message.value) {
+            return;
+          }
+          await params.onmessage(message.value);
+        },
+      });
     },
   };
 }
