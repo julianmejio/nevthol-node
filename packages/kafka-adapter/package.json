@@ -4,9 +4,13 @@
   "private": true,
   "description": "",
   "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "default": "./dist/index.js"
+    "./kafkajs": {
+      "types": "./src/kafkajs-adapter.ts",
+      "default": "./dist/kafkajs-adapter.js"
+    },
+    "./node-rdkafka": {
+      "types": "./src/node-rdkafka-adapter.ts",
+      "default": "./dist/node-rdkafka-adapter.js"
     }
   },
   "scripts": {
@@ -20,7 +24,8 @@
   "dependencies": {
     "@repo/core": "workspace:*",
     "@repo/messaging": "workspace:*",
-    "kafkajs": "^2.2.4"
+    "kafkajs": "^2.2.4",
+    "node-rdkafka": "^3.6.1"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

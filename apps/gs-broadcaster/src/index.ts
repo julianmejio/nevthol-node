@@ -1,12 +1,10 @@
-import { createKafkaConsumer } from "@repo/kafka-adapter";
+import { createKafkaConsumer } from "@repo/kafka-adapter/kafkajs";
 import { fromBinary } from "@bufbuild/protobuf";
 import {
-  PlayerPositionFlags,
   PlayerPositionSchema,
 } from "@repo/contracts/pb/player_position/v1/player_position_pb.js";
 import { createValidator } from "@bufbuild/protovalidate";
 import { getGridRoom } from "@repo/utils/coordinates";
-import { has } from "@repo/utils/bitmask";
 import { createRedisTransmitter } from "@repo/redis-adapter";
 
 const validator = createValidator();
@@ -14,7 +12,7 @@ const validator = createValidator();
 const consumer = createKafkaConsumer({
   clientId: "gs-broadcaster",
   brokers: ["localhost:9092"],
-  groupId: "test-gs-broadcaster-6",
+  groupId: "test-gs-broadcaster-8",
 });
 
 const transmitter = createRedisTransmitter({

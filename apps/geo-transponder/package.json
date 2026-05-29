@@ -15,9 +15,9 @@
   "license": "ISC",
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
     "@repo/kafka-adapter": "workspace:*",
     "@repo/messaging": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@testcontainers/kafka": "^11.14.0",
     "@tsconfig/node-ts": "^23.6.4",
     "@tsconfig/node24": "^24.0.4",
@@ -33,9 +33,10 @@
     "@bufbuild/protovalidate": "^1.2.0",
     "@repo/contracts": "workspace:*",
     "@repo/core": "workspace:*",
-    "@repo/vitest-config": "workspace:*",
     "@repo/utils": "workspace:*",
+    "@repo/vitest-config": "workspace:*",
     "kafkajs": "^2.2.4",
+    "node-rdkafka": "^3.6.1",
     "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.67.0",
     "zod": "^4.4.3"
   }
