@@ -14,6 +14,12 @@ const ConfigSchema = z.object({
     .number()
     .positive()
     .default(2 * DEFAULT_MAX_PAYLOAD_LENGTH),
+  QUEUE_BUFFERING_MAX_MESSAGES: z.coerce.number().positive().default(1000000),
+  QUEUE_BUFFERING_MAX_MS: z.coerce.number().positive().default(50),
+  BATCH_NUM_MESSAGES: z.coerce.number().positive().default(10000),
+  COMPRESSION_CODEC: z.enum(["none"]).default("none"),
+  REQUEST_REQUIRED_ACKS: z.coerce.number().positive().default(1),
+  EVENT_CB: z.boolean().default(true),
 });
 
 // Validate the env variables. We use parse bedause we want it fails if no
@@ -25,4 +31,10 @@ export const {
   MESSENGER_BROKER,
   MAX_PAYLOAD_LENGTH,
   MAX_BUFFERED_AMOUNT_PER_CONNECTION,
+  QUEUE_BUFFERING_MAX_MESSAGES,
+  QUEUE_BUFFERING_MAX_MS,
+  BATCH_NUM_MESSAGES,
+  COMPRESSION_CODEC,
+  REQUEST_REQUIRED_ACKS,
+  EVENT_CB,
 } = parseEnv;

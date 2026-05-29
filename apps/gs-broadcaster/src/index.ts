@@ -1,8 +1,6 @@
 import { createKafkaConsumer } from "@repo/kafka-adapter/kafkajs";
 import { fromBinary } from "@bufbuild/protobuf";
-import {
-  PlayerPositionSchema,
-} from "@repo/contracts/pb/player_position/v1/player_position_pb.js";
+import { PlayerPositionSchema } from "@repo/contracts/pb/player_position/v1/player_position_pb.js";
 import { createValidator } from "@bufbuild/protovalidate";
 import { getGridRoom } from "@repo/utils/coordinates";
 import { createRedisTransmitter } from "@repo/redis-adapter";

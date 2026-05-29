@@ -1,4 +1,13 @@
-import { LISTEN_PORT, MESSENGER_BROKER } from "./config.js";
+import {
+  LISTEN_PORT,
+  MESSENGER_BROKER,
+  QUEUE_BUFFERING_MAX_MESSAGES,
+  QUEUE_BUFFERING_MAX_MS,
+  BATCH_NUM_MESSAGES,
+  COMPRESSION_CODEC,
+  REQUEST_REQUIRED_ACKS,
+  EVENT_CB,
+} from "./config.js";
 import { createServer } from "./server.js";
 import process from "node:process";
 import { us_listen_socket_close } from "uWebSockets.js";
@@ -12,12 +21,12 @@ const bootstrap = async (): Promise<void> => {
     const messenger = createKafkaPublisher({
       clientId: "geo-transponder",
       brokers: [MESSENGER_BROKER],
-      queueBufferingMaxMessages: 1000000,
-      queueBufferingMaxMs: 50,
-      batchNumMessages: 10000,
-      compressionCodec: "none",
-      requestRequiredAcks: 1,
-      eventCb: true,
+      queueBufferingMaxMessages: QUEUE_BUFFERING_MAX_MESSAGES,
+      queueBufferingMaxMs: QUEUE_BUFFERING_MAX_MS,
+      batchNumMessages: BATCH_NUM_MESSAGES,
+      compressionCodec: COMPRESSION_CODEC,
+      requestRequiredAcks: REQUEST_REQUIRED_ACKS,
+      eventCb: EVENT_CB,
     });
     await messenger.connect();
     const { token } = await createServer({
