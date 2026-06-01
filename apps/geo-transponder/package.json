@@ -36,6 +36,7 @@
     "@repo/utils": "workspace:*",
     "@repo/vitest-config": "workspace:*",
     "kafkajs": "^2.2.4",
+    "nanoid": "^5.1.11",
     "node-rdkafka": "^3.6.1",
     "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.67.0",
     "zod": "^4.4.3"

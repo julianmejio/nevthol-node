@@ -12,6 +12,7 @@ import {
   MAX_BUFFERED_AMOUNT_PER_CONNECTION,
   MAX_PAYLOAD_LENGTH,
 } from "./config";
+import { nanoid } from "nanoid";
 
 const validator = createValidator();
 
@@ -28,6 +29,10 @@ export interface ServerParams {
   topicName: string;
 }
 
+export interface WebSocketUserData {
+  connectionId: string;
+}
+
 export const createServer = ({
   listeningPort = LISTEN_PORT,
   messenger,
@@ -35,24 +40,26 @@ export const createServer = ({
   maxBufferedAmountPerConnection = MAX_BUFFERED_AMOUNT_PER_CONNECTION,
   topicName,
 }: ServerParams): Promise<ServerInstance> => {
-  const app = uWS.App().ws("/*", {
+  const app = uWS.App().ws<WebSocketUserData>("/*", {
     compression: uWS.DISABLED,
     maxPayloadLength: maxPayloadLength,
     upgrade: (res, req, context) => {
-      const player = "Nevthol";
+      const userData: WebSocketUserData = {
+        connectionId: nanoid(10),
+      };
       res.upgrade(
-        { player }, // Your metadata object
+        userData,
         req.getHeader("sec-websocket-key"),
         req.getHeader("sec-websocket-protocol"),
         req.getHeader("sec-websocket-extensions"),
         context,
       );
     },
-    open: (ws: WebSocket<{ player: string }>) => {
-      const { player } = ws.getUserData();
-      console.log("Player connected", player);
+    open: (ws: WebSocket<WebSocketUserData>) => {
+      const { connectionId } = ws.getUserData();
+      console.log("Client connected", connectionId);
     },
-    message: (ws: WebSocket<{ player: string }>, message, isBinary) => {
+    message: (ws: WebSocket<WebSocketUserData>, message, isBinary) => {
       // Backpressure control: buffered amount of data
       if (ws.getBufferedAmount() > maxBufferedAmountPerConnection) {
         console.warn(
@@ -77,12 +84,16 @@ export const createServer = ({
           console.error("Invalid message received", validation.violations);
           return;
         }
-        const { player } = ws.getUserData();
+        const { connectionId } = ws.getUserData();
         // All fine, send message to Kafka
         const messageBuffer = Buffer.allocUnsafe(messagePayload.byteLength);
         messageBuffer.set(messagePayload);
         messenger
-          .publish({ topic: topicName, message: messageBuffer, key: player })
+          .publish({
+            topic: topicName,
+            message: messageBuffer,
+            key: connectionId,
+          })
           .catch((err) => {
             console.error("[IMessagePublisher] Error caught:", err);
             ws.end(1011, "Error in messenger upstream");
@@ -92,9 +103,14 @@ export const createServer = ({
         return;
       }
     },
-    close: (_ws: WebSocket<{ player: string }>, code, message) => {
+    close: (ws: WebSocket<WebSocketUserData>, code, message) => {
       const decoder = new TextDecoder("utf-8");
-      console.log(`Client disconnected (${code}).`, decoder.decode(message));
+      const { connectionId } = ws.getUserData();
+      console.log(
+        `Client disconnected (${code}).`,
+        connectionId,
+        decoder.decode(message),
+      );
     },
   });
   return new Promise((resolve) => {

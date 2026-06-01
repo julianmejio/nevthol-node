@@ -1,11 +1,37 @@
 import { z } from "zod";
 
+export const PlayerPositionFlags = {
+  NONE: 0,
+  IN_COMBAT: 1 << 0,
+  IS_COMMANDER: 1 << 1,
+};
+
+const validPlayerPositionFlags = Object.values(PlayerPositionFlags).reduce(
+  (acc, val) => acc | val,
+  0,
+);
+
 export const PlayerGeoPositionSchema = z.object({
   channel: z.string().regex(/^(\d+_){2}\d{1,3}$/),
   position: z.object({
-    playerName: z.string(),
-    x: z.number().gte(0).max(81920),
-    y: z.number().gte(0).max(114688),
+    l: z
+      .string()
+      .describe("Character name (not account name) that belongs this position"),
+    x: z.number().nonnegative().max(81920).describe("X position"),
+    y: z.number().nonnegative().max(114688).describe("Y position"),
+    z: z.number().optional().describe("Z position"),
+    f: z
+      .number()
+      .nonnegative()
+      .optional()
+      .default(PlayerPositionFlags.NONE)
+      .refine((val) => (val & ~validPlayerPositionFlags) === 0)
+      .describe("Position flags"),
+    m: z.number().nonnegative().optional().describe("Map ID"),
+    n: z.number().nonnegative().optional().describe("Mount ID"),
+    p: z.number().nonnegative().optional().describe("Profession ID"),
+    r: z.number().nonnegative().optional().describe("Race ID"),
+    s: z.number().nonnegative().optional().describe("Specialization ID"),
   }),
 });
 

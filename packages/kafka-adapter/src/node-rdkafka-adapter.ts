@@ -71,10 +71,17 @@ export function createKafkaConsumer(
       kafka.subscribe([params.topic]);
       kafka.consume();
       kafka.on("data", (message: Kafka.Message) => {
-        params.onmessage(
-          Buffer.from(message.value as Buffer),
-          (message.headers as unknown[]) || [],
-        );
+        const key: string | null =
+          message.key instanceof Buffer
+            ? message.key.toString()
+            : message.key !== null && message.key !== undefined
+              ? String(message.key)
+              : null;
+        params.onmessage({
+          key,
+          headers: (message.headers as unknown[]) || [],
+          contents: Buffer.from(message.value as Buffer),
+        });
       });
     },
   };
@@ -114,9 +121,8 @@ export function createKafkaPublisher(
         params.topic,
         -1,
         params.message,
-        params.key || "Anonymous",
+        params.key,
         Date.now(),
-        [{ player: params.key || "Anonymous" }],
         () => {},
       ),
   };

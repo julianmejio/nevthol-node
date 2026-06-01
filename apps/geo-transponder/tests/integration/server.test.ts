@@ -77,7 +77,7 @@ describe("GEO transponder", () => {
     await new Promise((res) => setTimeout(res, 50));
 
     expect(logSpy).toHaveBeenCalledWith({
-      key: "Nevthol",
+      key: expect.stringMatching(/^[\w\d]{10}$/),
       topic: "player-position-v1",
       message: Buffer.from(
         new Uint8Array(toBinary(PlayerPositionSchema, validPayload)),

@@ -53,12 +53,22 @@ export function createKafkaConsumer(
         fromBeginning: true,
       });
 
-      consumer.run({
+      await consumer.run({
         eachMessage: async ({ message }) => {
           if (null === message.value) {
             return;
           }
-          await params.onmessage(message.value, []);
+          const key: string | null =
+            message.key instanceof Buffer
+              ? message.key.toString()
+              : message.key !== null && message.key !== undefined
+                ? String(message.key)
+                : null;
+          await params.onmessage({
+            key,
+            headers: message.headers,
+            contents: message.value,
+          });
         },
       });
     },
