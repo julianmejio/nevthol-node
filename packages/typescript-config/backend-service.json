@@ -3,7 +3,7 @@
     "extends": "./base.json",
     "compilerOptions": {
         "module": "ESNext",
-        "moduleResolution": "Bundler",
+        "moduleResolution": "bundler",
         "types": ["node"],
         "allowJs": true,
         "erasableSyntaxOnly": false

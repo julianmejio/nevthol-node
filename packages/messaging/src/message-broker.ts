@@ -6,7 +6,7 @@ export interface PublisherParams {
 
 export interface ConsumerParams {
   topic: string;
-  onmessage: (message: Buffer) => Promise<void>;
+  onmessage: (message: Buffer, headers: unknown[]) => Promise<void>;
 }
 
 export interface IMessagePublisher {

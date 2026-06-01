@@ -157,6 +157,9 @@ importers:
       kafkajs:
         specifier: ^2.2.4
         version: 2.2.4
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
       '@tsconfig/node-ts':
         specifier: ^23.6.4

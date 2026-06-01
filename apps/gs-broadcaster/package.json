@@ -23,12 +23,13 @@
   "dependencies": {
     "@bufbuild/protobuf": "^2.12.0",
     "@bufbuild/protovalidate": "^1.2.0",
+    "@repo/broadcasting": "workspace:*",
     "@repo/contracts": "workspace:*",
     "@repo/kafka-adapter": "workspace:*",
-    "@repo/redis-adapter": "workspace:*",
-    "@repo/broadcasting": "workspace:*",
     "@repo/messaging": "workspace:*",
+    "@repo/redis-adapter": "workspace:*",
     "@repo/utils": "workspace:*",
-    "kafkajs": "^2.2.4"
+    "kafkajs": "^2.2.4",
+    "zod": "^4.4.3"
   }
 }

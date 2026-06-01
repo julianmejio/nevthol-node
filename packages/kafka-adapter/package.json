@@ -11,6 +11,10 @@
     "./node-rdkafka": {
       "types": "./src/node-rdkafka-adapter.ts",
       "default": "./dist/node-rdkafka-adapter.js"
+    },
+    "./common": {
+      "types": "./src/common.ts",
+      "default": "./dist/common.js"
     }
   },
   "scripts": {

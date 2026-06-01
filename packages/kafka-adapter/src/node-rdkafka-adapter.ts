@@ -1,10 +1,17 @@
 import type { IInitializable } from "@repo/core/lifecycle.js";
-import type { IMessagePublisher } from "@repo/messaging/message-broker.js";
-import Kafka from "node-rdkafka";
+import type {
+  ConsumerParams,
+  IMessageConsumer,
+  IMessagePublisher,
+} from "@repo/messaging/message-broker.js";
+import Kafka, { type ConsumerTopicConfig } from "node-rdkafka";
+import type {
+  KafkaCommonAdapterParams,
+  KafkaConsumerParams,
+} from "./common.js";
 
 export interface KafkaRdAdapterParams {
   clientId: string;
-  brokers: string[];
   queueBufferingMaxMessages: number;
   queueBufferingMaxMs: number;
   batchNumMessages: number;
@@ -13,8 +20,68 @@ export interface KafkaRdAdapterParams {
   eventCb: boolean;
 }
 
+export interface KafkaRdConsumerParams {
+  fetchMinBytes: number;
+  fetchWaitMaxMs: number;
+  fetchMessageMaxBytes: number;
+  enableAutoCommit: boolean;
+  queuedMinMessages: number;
+  autoOffsetReset: ConsumerTopicConfig["auto.offset.reset"];
+}
+
+export function createKafkaConsumer(
+  params: KafkaCommonAdapterParams &
+    KafkaConsumerParams &
+    KafkaRdConsumerParams,
+): IMessageConsumer & IInitializable {
+  const kafka = new Kafka.KafkaConsumer(
+    {
+      // 1. Connection settings
+      "metadata.broker.list": params.brokers.join(","),
+      "group.id": params.groupId,
+
+      // 2. Optimizations
+      "fetch.min.bytes": params.fetchMinBytes, // 1024 * 64, // Wait until 64KB of data is ready in the buffer
+      "fetch.wait.max.ms": params.fetchWaitMaxMs, //50, // ...or wait a max of 50ms before delivering
+      "fetch.message.max.bytes": params.fetchMessageMaxBytes, //1024 * 1024 * 10, // Max fetch size per request (10MB)
+
+      // 3. Offset and Commit optimizations
+      "enable.auto.commit": params.enableAutoCommit, //false, // Turn off individual message tracking
+
+      // 4. Memory queuing
+      "queued.min.messages": params.queuedMinMessages, //500000, // Keep up to 500k messages pre-fetched in native C++ memory
+    },
+    {
+      "auto.offset.reset": params.autoOffsetReset, // "latest",
+    },
+  );
+  return {
+    connect: async () => {
+      return new Promise((resolve) => {
+        kafka.on("ready", () => {
+          resolve();
+        });
+        kafka.connect();
+      });
+    },
+    disconnect: async () => {
+      kafka.disconnect();
+    },
+    subscribe: async (params: ConsumerParams) => {
+      kafka.subscribe([params.topic]);
+      kafka.consume();
+      kafka.on("data", (message: Kafka.Message) => {
+        params.onmessage(
+          Buffer.from(message.value as Buffer),
+          (message.headers as unknown[]) || [],
+        );
+      });
+    },
+  };
+}
+
 export function createKafkaPublisher(
-  params: KafkaRdAdapterParams,
+  params: KafkaCommonAdapterParams & KafkaRdAdapterParams,
 ): IInitializable & IMessagePublisher {
   const kafka = new Kafka.HighLevelProducer(
     {
@@ -34,7 +101,6 @@ export function createKafkaPublisher(
     connect: async () => {
       return new Promise((resolve) => {
         kafka.on("ready", () => {
-          console.log("Connected");
           resolve();
         });
         kafka.connect();
@@ -46,10 +112,11 @@ export function createKafkaPublisher(
     publish: async (params) =>
       kafka.produce(
         params.topic,
-        null,
+        -1,
         params.message,
-        params.key,
+        params.key || "Anonymous",
         Date.now(),
+        [{ player: params.key || "Anonymous" }],
         () => {},
       ),
   };

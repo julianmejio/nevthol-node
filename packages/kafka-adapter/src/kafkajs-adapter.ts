@@ -5,14 +5,11 @@ import {
 } from "@repo/messaging/message-broker.js";
 import { type IInitializable } from "@repo/core/lifecycle.js";
 import { Kafka, type Message, Partitioners } from "kafkajs";
+import type { KafkaConsumerParams } from "./common.js";
 
 export interface KafkaAdapterParams {
   clientId: string;
   brokers: string[];
-}
-
-export interface KafkaConsumerParams {
-  groupId: string;
 }
 
 export function createKafkaPublisher(
@@ -61,7 +58,7 @@ export function createKafkaConsumer(
           if (null === message.value) {
             return;
           }
-          await params.onmessage(message.value);
+          await params.onmessage(message.value, []);
         },
       });
     },
