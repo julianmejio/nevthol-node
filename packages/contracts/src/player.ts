@@ -1,16 +1,25 @@
 import { z } from "zod";
 
+/**
+ * Flags that can be assigned to a position of a player.
+ */
 export const PlayerPositionFlags = {
   NONE: 0,
   IN_COMBAT: 1 << 0,
   IS_COMMANDER: 1 << 1,
 };
 
+/**
+ * Valid flags. It sets all the possible bits in the flag's byte.
+ */
 const validPlayerPositionFlags = Object.values(PlayerPositionFlags).reduce(
   (acc, val) => acc | val,
   0,
 );
 
+/**
+ * Schema that describes a valid position description of a player.
+ */
 export const PlayerGeoPositionSchema = z.object({
   channel: z.string().regex(/^(\d+_){2}\d{1,3}$/),
   position: z.object({
@@ -35,4 +44,7 @@ export const PlayerGeoPositionSchema = z.object({
   }),
 });
 
+/**
+ * Schema that describes a valid position description of a player.
+ */
 export type PlayerPosition = z.infer<typeof PlayerGeoPositionSchema>;

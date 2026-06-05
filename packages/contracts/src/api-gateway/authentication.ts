@@ -4,11 +4,10 @@ import { AppErrorSchema } from "../error.js";
 /**
  * Schema that supports and validates Guild Wars 2 API key subtokens.
  * @see [GW2 API subtoken creation]{@link https://wiki.guildwars2.com/wiki/API:2/createsubtoken}.
- * @todo Move it to contracts package
  */
 export const PostAuthenticateRequestSchema = z
   .object({
-    /** GW2 API subtoken. */
+    /** GW2 API token, either a key or a subtoken */
     gw2token: z
       .union([
         z
@@ -26,7 +25,7 @@ export const PostAuthenticateRequestSchema = z
   .describe("Authentication payload for Guild Wars 2 subtokens");
 
 /**
- * Successful authentication response.
+ * Schema that validates the POST authentication response from the API.
  */
 const PostAuthenticateResponseSchema = z.union([
   z
@@ -46,6 +45,9 @@ const PostAuthenticateResponseSchema = z.union([
   AppErrorSchema,
 ]);
 
+/**
+ * Schema that validates the POST authentication response from the API.
+ */
 export type PostAuthenticateResponse = z.infer<
   typeof PostAuthenticateResponseSchema
 >;
