@@ -6,6 +6,7 @@
   "scripts": {
     "build": "esbuild src/index.ts --bundle --format=esm --packages=external --external:uWebSockets.js --platform=node --target=node24 --minify --outfile=dist/index.js",
     "dev": "[ -f .env ] && tsx --env-file=.env --watch src/index.ts || tsx --watch src/index.ts",
+    "clientTest": "tsx --watch src/testws.ts",
     "test": "vitest run .",
     "check-types": "tsc --noEmit",
     "lint": "eslint --max-warnings 0"
@@ -21,6 +22,7 @@
     "@testcontainers/kafka": "^11.14.0",
     "@tsconfig/node-ts": "^23.6.4",
     "@tsconfig/node24": "^24.0.4",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.19.19",
     "esbuild": "^0.28.0",
     "eslint": "^9.39.4",
@@ -35,10 +37,11 @@
     "@repo/core": "workspace:*",
     "@repo/utils": "workspace:*",
     "@repo/vitest-config": "workspace:*",
+    "jsonwebtoken": "^9.0.3",
     "kafkajs": "^2.2.4",
-    "nanoid": "^5.1.11",
     "node-rdkafka": "^3.6.1",
     "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.67.0",
+    "ws": "^8.21.0",
     "zod": "^4.4.3"
   }
 }

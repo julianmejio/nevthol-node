@@ -13,6 +13,18 @@
       "types": "./src/player.ts",
       "default": "./dist/player.js"
     },
+    "./error": {
+      "types": "./src/error.ts",
+      "default": "./dist/error.js"
+    },
+    "./gw2/v2": {
+      "types": "./src/gw2/v2/index.ts",
+      "default": "./dist/gw2/v2/index.js"
+    },
+    "./api-gateway/authentication": {
+      "types": "./src/api-gateway/authentication.ts",
+      "default": "./dist/api-gateway/authentication.js"
+    },
     "./*": {
       "types": "./src/*",
       "default": "./dist/*"

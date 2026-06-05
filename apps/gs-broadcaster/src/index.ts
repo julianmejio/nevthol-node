@@ -71,7 +71,7 @@ consumer.subscribe({
       (playerConnections.has(key) && playerConnections.get(key)) || null;
     if (characterName && playerName !== characterName) {
       playerConnections.set(key, characterName);
-      console.debug(`Connection ${key} is now known as ${characterName}`);
+      console.debug(`Connection ${key} now belongs to ${characterName}`);
     }
     if (null === playerName && undefined === characterName) {
       console.warn(`Connection ${key} has not been properly identified`);

@@ -12,7 +12,7 @@ import {
   MAX_BUFFERED_AMOUNT_PER_CONNECTION,
   MAX_PAYLOAD_LENGTH,
 } from "./config";
-import { nanoid } from "nanoid";
+import jwt, { type JwtPayload } from "jsonwebtoken";
 
 const validator = createValidator();
 
@@ -31,6 +31,7 @@ export interface ServerParams {
 
 export interface WebSocketUserData {
   connectionId: string;
+  allowedCharacters: string[];
 }
 
 export const createServer = ({
@@ -44,20 +45,35 @@ export const createServer = ({
     compression: uWS.DISABLED,
     maxPayloadLength: maxPayloadLength,
     upgrade: (res, req, context) => {
-      const userData: WebSocketUserData = {
-        connectionId: nanoid(10),
-      };
-      res.upgrade(
-        userData,
-        req.getHeader("sec-websocket-key"),
-        req.getHeader("sec-websocket-protocol"),
-        req.getHeader("sec-websocket-extensions"),
-        context,
-      );
+      try {
+        const jwtToken = req.getHeader("authorization").replace("Bearer ", "");
+        const jwtVerification = jwt.verify(
+          jwtToken,
+          "secretToken",
+        ) as JwtPayload;
+        const userData: WebSocketUserData = {
+          connectionId: jwtVerification["jti"] as string,
+          allowedCharacters: (jwtVerification["chl"] as string).split(","),
+        };
+        res.upgrade(
+          userData,
+          req.getHeader("sec-websocket-key"),
+          req.getHeader("sec-websocket-protocol"),
+          req.getHeader("sec-websocket-extensions"),
+          context,
+        );
+      } catch (error) {
+        console.error("An error occurred when upgrading the connection", error);
+        res.writeStatus("401 Unauthorized").end("Invalid connection");
+      }
     },
     open: (ws: WebSocket<WebSocketUserData>) => {
-      const { connectionId } = ws.getUserData();
+      const { connectionId, allowedCharacters } = ws.getUserData();
       console.log("Client connected", connectionId);
+      console.log(
+        "Allowed characters to log are",
+        allowedCharacters.join(", "),
+      );
     },
     message: (ws: WebSocket<WebSocketUserData>, message, isBinary) => {
       // Backpressure control: buffered amount of data
