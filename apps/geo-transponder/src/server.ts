@@ -8,6 +8,7 @@ import { fromBinary } from "@bufbuild/protobuf";
 import { createValidator } from "@bufbuild/protovalidate";
 import type { IMessagePublisher } from "@repo/messaging/message-broker.js";
 import {
+  JWT_PUBLIC_KEY,
   LISTEN_PORT,
   MAX_BUFFERED_AMOUNT_PER_CONNECTION,
   MAX_PAYLOAD_LENGTH,
@@ -49,7 +50,7 @@ export const createServer = ({
         const jwtToken = req.getHeader("authorization").replace("Bearer ", "");
         const jwtVerification = jwt.verify(
           jwtToken,
-          "secretToken",
+          JWT_PUBLIC_KEY,
         ) as JwtPayload;
         const userData: WebSocketUserData = {
           connectionId: jwtVerification["jti"] as string,

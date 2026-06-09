@@ -15,14 +15,20 @@ export const PostAuthenticateRequestSchema = z
           .describe("Guild Wars 2 subtoken"),
         z
           .string({ error: "Token is malformed" })
-          .regex(
-            /^([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}){2}$/i,
-          )
+          .regex(/^([0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}){2}$/i)
           .describe("Guild Wars 2 token"),
       ])
       .describe("Guild Wars 2 token or subtoken"),
   })
   .describe("Authentication payload for Guild Wars 2 subtokens");
+
+/**
+ * Schema that supports and validates Guild Wars 2 API key subtokens.
+ * @see [GW2 API subtoken creation]{@link https://wiki.guildwars2.com/wiki/API:2/createsubtoken}.
+ */
+export type PostAuthenticateRequest = z.infer<
+  typeof PostAuthenticateRequestSchema
+>;
 
 /**
  * Schema that validates the POST authentication response from the API.

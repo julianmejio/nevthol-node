@@ -33,11 +33,9 @@ export const Gw2ApiTokenInfoSchema = z.object({
   /** The first half of the API key that was requested. */
   id: z
     .string({ error: "Token ID is not present" })
-    .pipe(
-      z.union([z.uuid({ version: "v4" }), z.jwt()], {
-        error: "Token ID is invalid",
-      }),
-    )
+    .regex(/^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$/i, {
+      error: "Token ID is invalid",
+    })
     .describe("The first half of the API key that was requested"),
   /** The name given to the API key by the account owner. Warning: The value of this field is not escaped and may contain valid HTML, JavaScript, other code. Handle with care. */
   name: z

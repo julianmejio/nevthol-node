@@ -20,6 +20,9 @@ importers:
 
   apps/api-gateway:
     dependencies:
+      '@repo/authentication':
+        specifier: workspace:*
+        version: link:../../packages/authentication
       '@repo/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
@@ -301,6 +304,55 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
+
+  packages/authentication:
+    dependencies:
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@repo/gw2api-adapter':
+        specifier: workspace:*
+        version: link:../gw2api-adapter
+      jsonwebtoken:
+        specifier: ^9.0.3
+        version: 9.0.3
+      nanoid:
+        specifier: ^5.1.11
+        version: 5.1.11
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/game-api':
+        specifier: workspace:*
+        version: link:../game-api
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@repo/vitest-config':
+        specifier: workspace:*
+        version: link:../vitest-config
+      '@tsconfig/node-ts':
+        specifier: ^23.6.4
+        version: 23.6.4
+      '@tsconfig/node24':
+        specifier: ^24.0.4
+        version: 24.0.4
+      '@types/jsonwebtoken':
+        specifier: ^9.0.10
+        version: 9.0.10
+      '@types/node':
+        specifier: ^22.19.19
+        version: 22.19.19
+      eslint:
+        specifier: ^9.39.4
+        version: 9.39.4
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.1.6
+        version: 4.1.6(@types/node@22.19.19)(vite@8.0.10(@types/node@22.19.19)(esbuild@0.28.0)(tsx@4.21.0)(yaml@2.9.0))
 
   packages/broadcasting:
     dependencies:

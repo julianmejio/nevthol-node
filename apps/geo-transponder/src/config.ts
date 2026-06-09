@@ -20,6 +20,7 @@ const ConfigSchema = z.object({
   COMPRESSION_CODEC: z.enum(["none"]).default("none"),
   REQUEST_REQUIRED_ACKS: z.coerce.number().positive().default(1),
   EVENT_CB: z.boolean().default(true),
+  JWT_PUBLIC_KEY: z.string(),
 });
 
 // Validate the env variables. We use parse bedause we want it fails if no
@@ -37,4 +38,5 @@ export const {
   COMPRESSION_CODEC,
   REQUEST_REQUIRED_ACKS,
   EVENT_CB,
+  JWT_PUBLIC_KEY,
 } = parseEnv;
