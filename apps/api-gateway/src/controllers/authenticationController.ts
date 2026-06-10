@@ -6,26 +6,27 @@ import {
 import { createAccountClient } from "@repo/gw2api-adapter/account";
 import { type AppError, AppErrorCode } from "@repo/contracts/error";
 import { JWT_PRIVATE_KEY } from "../config";
-import createAuthenticationService from "@repo/authentication/authentication-service";
+import { createAuthenticationService } from "@repo/authentication/authentication-service";
+import { createConnectionStore } from "@repo/redis-adapter/connection";
 
 export const authenticate = async (
   req: Request<PostAuthenticateRequest>,
   res: Response<PostAuthenticateResponse | AppError>,
   _next: NextFunction,
 ) => {
+  const userClient = createConnectionStore({
+    url: "redis://default@localhost:6379",
+  });
+  await userClient.connect();
   const authenticationService = createAuthenticationService(
     createAccountClient(),
+    userClient,
   );
   try {
     const response =
       await authenticationService.getAuthenticationJwtByGw2ApiKey(
         req.body,
         JWT_PRIVATE_KEY,
-        {
-          issuer: "com.gwradar.login",
-          audience: "com.gwradar.login",
-          subject: "com.gwradar.jwt",
-        },
       );
     return res.status(201).send(response);
   } catch {

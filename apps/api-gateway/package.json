@@ -13,6 +13,7 @@
   "dependencies": {
     "@repo/contracts": "workspace:*",
     "@repo/gw2api-adapter": "workspace:*",
+    "@repo/redis-adapter": "workspace:*",
     "@repo/authentication": "workspace:*",
     "cors": "^2.8.6",
     "express": "^5.2.1",

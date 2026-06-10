@@ -29,6 +29,9 @@ importers:
       '@repo/gw2api-adapter':
         specifier: workspace:*
         version: link:../../packages/gw2api-adapter
+      '@repo/redis-adapter':
+        specifier: workspace:*
+        version: link:../../packages/redis-adapter
       cors:
         specifier: ^2.8.6
         version: 2.8.6
@@ -142,6 +145,12 @@ importers:
       '@repo/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@repo/redis-adapter':
+        specifier: workspace:*
+        version: link:../../packages/redis-adapter
+      '@repo/session':
+        specifier: workspace:*
+        version: link:../../packages/session
       '@repo/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -233,6 +242,9 @@ importers:
       '@repo/redis-adapter':
         specifier: workspace:*
         version: link:../../packages/redis-adapter
+      '@repo/session':
+        specifier: workspace:*
+        version: link:../../packages/session
       '@repo/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -313,6 +325,9 @@ importers:
       '@repo/gw2api-adapter':
         specifier: workspace:*
         version: link:../gw2api-adapter
+      '@repo/session':
+        specifier: workspace:*
+        version: link:../session
       jsonwebtoken:
         specifier: ^9.0.3
         version: 9.0.3
@@ -626,6 +641,9 @@ importers:
       '@repo/core':
         specifier: workspace:*
         version: link:../core
+      '@repo/session':
+        specifier: workspace:*
+        version: link:../session
       redis:
         specifier: ^5.12.1
         version: 5.12.1
@@ -657,6 +675,62 @@ importers:
       vitest:
         specifier: ^4.1.6
         version: 4.1.6(@types/node@22.19.19)(vite@8.0.10(@types/node@22.19.19)(esbuild@0.28.0)(tsx@4.21.0)(yaml@2.9.0))
+
+  packages/session:
+    dependencies:
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@tsconfig/node-ts':
+        specifier: ^23.6.4
+        version: 23.6.4
+      '@tsconfig/node24':
+        specifier: ^24.0.4
+        version: 24.0.4
+      '@types/node':
+        specifier: ^22.19.19
+        version: 22.19.19
+      eslint:
+        specifier: ^9.39.4
+        version: 9.39.4
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/tracking:
+    dependencies:
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@tsconfig/node-ts':
+        specifier: ^23.6.4
+        version: 23.6.4
+      '@tsconfig/node24':
+        specifier: ^24.0.4
+        version: 24.0.4
+      '@types/node':
+        specifier: ^22.19.19
+        version: 22.19.19
+      eslint:
+        specifier: ^9.39.4
+        version: 9.39.4
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
 
   packages/typescript-config: {}
 

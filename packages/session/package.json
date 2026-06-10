@@ -1,13 +1,9 @@
 {
-  "name": "@repo/redis-adapter",
+  "name": "@repo/session",
+  "version": "1.0.0",
   "type": "module",
   "private": true,
-  "description": "",
   "exports": {
-    "./transmitter": {
-      "types": "./src/transmitter.ts",
-      "default": "./dist/transmitter.js"
-    },
     "./connection": {
       "types": "./src/connection.ts",
       "default": "./dist/connection.js"
@@ -17,30 +13,19 @@
       "default": "./dist/user.js"
     }
   },
-  "scripts": {
-    "build": "tsc",
-    "check-types": "tsc --noEmit",
-    "lint": "eslint --max-warnings 0"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@repo/broadcasting": "workspace:*",
-    "@repo/contracts": "workspace:*",
-    "@repo/core": "workspace:*",
-    "@repo/session": "workspace:*",
-    "redis": "^5.12.1"
+    "@repo/contracts": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@repo/vitest-config": "workspace:*",
     "@tsconfig/node-ts": "^23.6.4",
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^22.19.19",
     "eslint": "^9.39.4",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.6"
+    "typescript": "^6.0.3"
   }
 }

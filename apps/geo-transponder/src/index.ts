@@ -12,6 +12,7 @@ import { createServer } from "./server.js";
 import process from "node:process";
 import { us_listen_socket_close } from "uWebSockets.js";
 import { createKafkaPublisher } from "@repo/kafka-adapter/node-rdkafka";
+import { createConnectionStore } from "@repo/redis-adapter/connection";
 
 // Hardcoded as this is part of the internal versioning
 const topicName: string = "player-position-v1";
@@ -29,8 +30,13 @@ const bootstrap = async (): Promise<void> => {
       eventCb: EVENT_CB,
     });
     await messenger.connect();
+    const store = createConnectionStore({
+      url: "redis://default@localhost:6379",
+    });
+    await store.connect();
     const { token } = await createServer({
       messenger,
+      store,
       topicName,
       listeningPort: LISTEN_PORT,
     });

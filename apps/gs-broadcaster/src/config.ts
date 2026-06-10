@@ -15,7 +15,7 @@ const ConfigSchema = z.object({
     .default(1024 * 1024 * 10),
   ENABLE_AUTO_COMMIT: z.coerce.boolean().default(false),
   QUEUED_MIN_MESSAGES: z.coerce.number().positive().default(500000),
-  AUTO_OFFSET_RESET: z.enum(["latest", "beginning"]).default("beginning"),
+  AUTO_OFFSET_RESET: z.enum(["latest", "beginning"]).default("latest"),
 });
 
 const parseEnv = ConfigSchema.parse(process.env);

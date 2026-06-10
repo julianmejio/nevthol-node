@@ -19,6 +19,7 @@
   "dependencies": {
     "@repo/contracts": "workspace:*",
     "@repo/gw2api-adapter": "workspace:*",
+    "@repo/session": "workspace:*",
     "jsonwebtoken": "^9.0.3",
     "nanoid": "^5.1.11"
   },

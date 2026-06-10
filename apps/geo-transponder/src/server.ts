@@ -14,6 +14,7 @@ import {
   MAX_PAYLOAD_LENGTH,
 } from "./config";
 import jwt, { type JwtPayload } from "jsonwebtoken";
+import type { IConnectionStore } from "@repo/session/connection";
 
 const validator = createValidator();
 
@@ -25,6 +26,7 @@ export interface ServerInstance {
 export interface ServerParams {
   listeningPort?: number;
   messenger: IMessagePublisher;
+  store: IConnectionStore;
   maxPayloadLength?: number;
   maxBufferedAmountPerConnection?: number;
   topicName: string;
@@ -32,12 +34,12 @@ export interface ServerParams {
 
 export interface WebSocketUserData {
   connectionId: string;
-  allowedCharacters: string[];
 }
 
 export const createServer = ({
   listeningPort = LISTEN_PORT,
   messenger,
+  store,
   maxPayloadLength = MAX_PAYLOAD_LENGTH,
   maxBufferedAmountPerConnection = MAX_BUFFERED_AMOUNT_PER_CONNECTION,
   topicName,
@@ -54,7 +56,6 @@ export const createServer = ({
         ) as JwtPayload;
         const userData: WebSocketUserData = {
           connectionId: jwtVerification["jti"] as string,
-          allowedCharacters: (jwtVerification["chl"] as string).split(","),
         };
         res.upgrade(
           userData,
@@ -69,12 +70,8 @@ export const createServer = ({
       }
     },
     open: (ws: WebSocket<WebSocketUserData>) => {
-      const { connectionId, allowedCharacters } = ws.getUserData();
+      const { connectionId } = ws.getUserData();
       console.log("Client connected", connectionId);
-      console.log(
-        "Allowed characters to log are",
-        allowedCharacters.join(", "),
-      );
     },
     message: (ws: WebSocket<WebSocketUserData>, message, isBinary) => {
       // Backpressure control: buffered amount of data
@@ -120,9 +117,10 @@ export const createServer = ({
         return;
       }
     },
-    close: (ws: WebSocket<WebSocketUserData>, code, message) => {
+    close: async (ws: WebSocket<WebSocketUserData>, code, message) => {
       const decoder = new TextDecoder("utf-8");
       const { connectionId } = ws.getUserData();
+      await store.delete(connectionId);
       console.log(
         `Client disconnected (${code}).`,
         connectionId,

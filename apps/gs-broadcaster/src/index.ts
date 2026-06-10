@@ -6,7 +6,14 @@ import {
 } from "@repo/contracts/pb/player_position/v1/player_position_pb.js";
 import { createValidator } from "@bufbuild/protovalidate";
 import { getGridRoom } from "@repo/utils/coordinates";
-import { createRedisTransmitter } from "@repo/redis-adapter";
+import {
+  createRedisTransmitter,
+  type RedisTransmitterParams,
+} from "@repo/redis-adapter/transmitter";
+import {
+  createConnectionStore,
+  type RedisConnectionStoreParams,
+} from "@repo/redis-adapter/connection";
 import {
   AUTO_OFFSET_RESET,
   ENABLE_AUTO_COMMIT,
@@ -17,7 +24,12 @@ import {
   MESSENGER_BROKER,
   QUEUED_MIN_MESSAGES,
 } from "./config.js";
-import type { PlayerPosition as BroadcastPlayerPosition } from "@repo/contracts/player";
+import {
+  type PlayerPosition as BroadcastPlayerPosition,
+  PlayerPositionFlags,
+} from "@repo/contracts/player";
+import { createUserStore } from "@repo/redis-adapter/user";
+import { has } from "@repo/utils/bitmask";
 
 const playerConnections = new Map<string, string>();
 const validator = createValidator();
@@ -33,9 +45,13 @@ const consumer = createKafkaConsumer({
   autoOffsetReset: AUTO_OFFSET_RESET,
 });
 
-const transmitter = createRedisTransmitter({
+const redisParameters: RedisTransmitterParams & RedisConnectionStoreParams = {
   url: "redis://default@localhost:6379",
-});
+};
+
+const transmitter = createRedisTransmitter(redisParameters);
+const connectionStore = createConnectionStore(redisParameters);
+const userStore = createUserStore(redisParameters);
 
 const optionalPositionFieldsMap: Partial<
   Record<keyof PlayerPosition, keyof BroadcastPlayerPosition["position"]>
@@ -50,7 +66,9 @@ const optionalPositionFieldsMap: Partial<
 
 await consumer.connect();
 await transmitter.connect();
-consumer.subscribe({
+await connectionStore.connect();
+await userStore.connect();
+await consumer.subscribe({
   topic: "player-position-v1",
   onmessage: async ({ key, contents }) => {
     const messageDecoded = fromBinary(PlayerPositionSchema, contents);
@@ -70,14 +88,26 @@ consumer.subscribe({
     const playerName =
       (playerConnections.has(key) && playerConnections.get(key)) || null;
     if (characterName && playerName !== characterName) {
+      const allowedNames = (await connectionStore.getAllowedCharacters(
+        key,
+      )) as unknown;
+      if (
+        !Array.isArray(allowedNames) ||
+        !allowedNames.includes(characterName)
+      ) {
+        console.error(`${characterName} cannot broadcast on channel ${key}`);
+        return;
+      }
       playerConnections.set(key, characterName);
-      console.debug(`Connection ${key} now belongs to ${characterName}`);
+      await connectionStore.setCurrentCharacter(key, characterName);
+      await userStore.deleteUser(String(playerName));
+      console.debug(`${characterName} is now broadcasting on channel ${key}`);
     }
     if (null === playerName && undefined === characterName) {
-      console.warn(`Connection ${key} has not been properly identified`);
+      console.warn(`No character broadcasting in ${key}`);
       return;
     }
-    const effectiveName = playerName || characterName;
+    const effectiveName = characterName || playerName;
     const position: BroadcastPlayerPosition = {
       channel: getGridRoom({ x, y, gridSize: 500 }),
       position: {
@@ -97,5 +127,34 @@ consumer.subscribe({
       }
     }
     await transmitter.broadcastPosition(position);
+    await connectionStore.increasePositionCount(key);
+    await connectionStore.expire(key, 86400);
+    if (playerConnections.get(key) !== position.position.l) {
+      return;
+    }
+    await userStore.setAttributes(position.position.l, {
+      X: position.position.x,
+      Y: position.position.y,
+      Z: position.position.z || 0,
+      InCombat: has({
+        mask: position.position.f,
+        flag: PlayerPositionFlags.IN_COMBAT,
+      })
+        ? 1
+        : 0,
+      Commander: has({
+        mask: position.position.f,
+        flag: PlayerPositionFlags.IS_COMMANDER,
+      })
+        ? 1
+        : 0,
+      MapId: position.position.m || "",
+      MountId: position.position.n || 0,
+      ProfessionId: position.position.p || 0,
+      RaceId: position.position.r || 0,
+      SpecializationId: position.position.s || 0,
+      LastUpdated: Date.now().toString(),
+      Connection: key,
+    });
   },
 });
