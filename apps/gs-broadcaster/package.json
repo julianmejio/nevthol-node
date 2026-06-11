@@ -28,6 +28,7 @@
     "@repo/kafka-adapter": "workspace:*",
     "@repo/messaging": "workspace:*",
     "@repo/session": "workspace:*",
+    "@repo/tracker": "workspace:*",
     "@repo/redis-adapter": "workspace:*",
     "@repo/utils": "workspace:*",
     "kafkajs": "^2.2.4",

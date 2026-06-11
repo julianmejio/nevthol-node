@@ -12,6 +12,10 @@
       "types": "./src/connection.ts",
       "default": "./dist/connection.js"
     },
+    "./tracker": {
+      "types": "./src/characterTracker.ts",
+      "default": "./dist/characterTracker.js"
+    },
     "./user": {
       "types": "./src/user.ts",
       "default": "./dist/user.js"
@@ -30,6 +34,7 @@
     "@repo/contracts": "workspace:*",
     "@repo/core": "workspace:*",
     "@repo/session": "workspace:*",
+    "@repo/tracker": "workspace:*",
     "redis": "^5.12.1"
   },
   "devDependencies": {

@@ -29,6 +29,10 @@ import {
   PlayerPositionFlags,
 } from "@repo/contracts/player";
 import { createUserStore } from "@repo/redis-adapter/user";
+import {
+  createRedisTracker,
+  type RedisTrackerParams,
+} from "@repo/redis-adapter/tracker";
 import { has } from "@repo/utils/bitmask";
 
 const playerConnections = new Map<string, string>();
@@ -45,13 +49,16 @@ const consumer = createKafkaConsumer({
   autoOffsetReset: AUTO_OFFSET_RESET,
 });
 
-const redisParameters: RedisTransmitterParams & RedisConnectionStoreParams = {
+const redisParameters: RedisTransmitterParams &
+  RedisConnectionStoreParams &
+  RedisTrackerParams = {
   url: "redis://default@localhost:6379",
 };
 
 const transmitter = createRedisTransmitter(redisParameters);
 const connectionStore = createConnectionStore(redisParameters);
 const userStore = createUserStore(redisParameters);
+const tracker = createRedisTracker(redisParameters);
 
 const optionalPositionFieldsMap: Partial<
   Record<keyof PlayerPosition, keyof BroadcastPlayerPosition["position"]>
@@ -68,6 +75,7 @@ await consumer.connect();
 await transmitter.connect();
 await connectionStore.connect();
 await userStore.connect();
+await tracker.connect();
 await consumer.subscribe({
   topic: "player-position-v1",
   onmessage: async ({ key, contents }) => {
@@ -156,5 +164,10 @@ await consumer.subscribe({
       LastUpdated: Date.now().toString(),
       Connection: key,
     });
+    await tracker.addDataPoint(
+      position.position.l,
+      position.position.x,
+      position.position.y,
+    );
   },
 });
