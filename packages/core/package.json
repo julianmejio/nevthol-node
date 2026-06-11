@@ -11,6 +11,10 @@
     "./lifecycle": {
       "types": "./src/lifecycle.ts",
       "default": "./dist/lifecycle.js"
+    },
+    "./bitmask": {
+      "types": "./src/bitmask.ts",
+      "default": "./dist/bitmask.js"
     }
   },
   "scripts": {

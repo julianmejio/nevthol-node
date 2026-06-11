@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "private": true,
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "lint": "eslint --max-warnings 0"
+  },
   "exports": {
     "./*": {
       "types": "./src/*",

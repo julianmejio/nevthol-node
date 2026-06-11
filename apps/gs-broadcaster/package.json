@@ -5,6 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "check-types": "tsc --noEmit",
+    "lint": "eslint --max-warnings 0",
     "dev": "[ -f .env ] && tsx --env-file=.env --watch src/index.ts || tsx --watch src/index.ts"
   },
   "keywords": [],
@@ -14,6 +16,7 @@
     "@tsconfig/node-ts": "^23.6.4",
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^22.19.19",
+    "@repo/typescript-config": "workspace:*",
     "esbuild": "^0.28.0",
     "eslint": "^9.39.4",
     "testcontainers": "^11.14.0",
@@ -30,7 +33,7 @@
     "@repo/session": "workspace:*",
     "@repo/tracker": "workspace:*",
     "@repo/redis-adapter": "workspace:*",
-    "@repo/utils": "workspace:*",
+    "@repo/core": "workspace:*",
     "kafkajs": "^2.2.4",
     "zod": "^4.4.3"
   }

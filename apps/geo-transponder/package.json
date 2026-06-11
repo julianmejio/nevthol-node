@@ -37,7 +37,6 @@
     "@repo/session": "workspace:*",
     "@repo/redis-adapter": "workspace:*",
     "@repo/core": "workspace:*",
-    "@repo/utils": "workspace:*",
     "@repo/vitest-config": "workspace:*",
     "jsonwebtoken": "^9.0.3",
     "kafkajs": "^2.2.4",

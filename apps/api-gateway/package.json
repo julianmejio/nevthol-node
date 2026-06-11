@@ -5,6 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "check-types": "tsc --noEmit",
+    "lint": "eslint --max-warnings 0",
     "dev": "[ -f .env ] && tsx --env-file=.env --watch src/index.ts || tsx --watch src/index.ts"
   },
   "keywords": [],

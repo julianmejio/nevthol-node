@@ -3,7 +3,7 @@
     "@tsconfig/node24/tsconfig.json",
     "@tsconfig/node-ts/tsconfig.json",
     "@repo/typescript-config/base.json",
-    "@repo/typescript-config/backend-service"
+    "@repo/typescript-config/backend-service.json"
   ],
   "compilerOptions": {
     "rootDir": "./src",

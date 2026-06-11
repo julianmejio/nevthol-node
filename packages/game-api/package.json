@@ -9,6 +9,10 @@
       "default": "./dist/account.js"
     }
   },
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "lint": "eslint --max-warnings 0"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

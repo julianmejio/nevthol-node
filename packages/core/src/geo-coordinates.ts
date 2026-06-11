@@ -79,4 +79,108 @@ const unpackCoordinates = (buffer: Buffer): { x: number; y: number } => {
   };
 };
 
-export { tyriaToLatLng, latLngToTyria, packCoordinates, unpackCoordinates };
+/**
+ * Represents a point, associated with a grid size for grid calculations.
+ */
+interface GridPoint {
+  /** X coordinate. */
+  x: number;
+  /** Y coordinate */
+  y: number;
+  /** Grid size where the point must be located */
+  gridSize?: number;
+}
+
+/**
+ * Radius where the viewport should be located
+ */
+interface ViewportRadiusCoordinates {
+  radius: number;
+}
+
+/**
+ * Checks if a point is inside a circle or not.
+ * @param {number} circle_x Center of the circle in X.
+ * @param {number} circle_y Center of the circle in Y.
+ * @param {number} rad Radius of the circle
+ * @param {number} x Point in X
+ * @param {number} y Point in Y
+ * @return `true` if the point is inside the circle, `false` otherwise.
+ */
+function isInside(
+  circle_x: number,
+  circle_y: number,
+  rad: number,
+  x: number,
+  y: number,
+) {
+  // Compare radius of circle with
+  // distance of its center from
+  // given point
+
+  if (
+    (x - circle_x) * (x - circle_x) + (y - circle_y) * (y - circle_y) <=
+    rad * rad
+  )
+    return true;
+  else return false;
+}
+
+/**
+ * Get the name of the grid room to locate the point.
+ * @param param0
+ * @param {number} param0.x Point in X
+ * @param {number} param0.y Point in Y
+ * @param {number} param0.gridSize Grid size
+ * @return {string} Name of the room associated to the point.
+ */
+const getGridRoom = ({ x, y, gridSize = 100 }: GridPoint): string =>
+  `${gridSize}_${Math.floor(x / gridSize)}_${Math.floor(y / gridSize)}`;
+
+/**
+ * Get the list of the rooms that are near to the point
+ * @param param0
+ * @param {number} param0.x Point in X
+ * @param {number} param0.y Point in Y
+ * @param {number} param0.gridSize Grid size
+ * @param {number} param0.radius Radius size, where all the rooms in there will be listed.
+ * @return {Set<string>} List of rooms near to the point of interest.
+ */
+const getNearestRooms = ({
+  x,
+  y,
+  gridSize = 100,
+  radius = 1000,
+}: GridPoint & ViewportRadiusCoordinates): Set<string> => {
+  const subscriptions = new Set<string>();
+  const minX = x - radius;
+  const minY = y - radius;
+  const maxX = x + radius;
+  const maxY = y + radius;
+  const minRoomX = Math.floor(minX / gridSize);
+  const minRoomY = Math.floor(minY / gridSize);
+  const maxRoomX = Math.floor(maxX / gridSize);
+  const maxRoomY = Math.floor(maxY / gridSize);
+  const xGrid = Math.floor(x / gridSize);
+  const yGrid = Math.floor(y / gridSize);
+  const radGrid = Math.floor(radius / gridSize);
+  for (let i = minRoomX; i <= maxRoomX; i++) {
+    for (let j = minRoomY; j <= maxRoomY; j++) {
+      if (isInside(xGrid, yGrid, radGrid, i, j)) {
+        subscriptions.add(`${gridSize}_${i}_${j}`);
+      }
+    }
+  }
+  return subscriptions;
+};
+
+export {
+  tyriaToLatLng,
+  latLngToTyria,
+  packCoordinates,
+  unpackCoordinates,
+  type GridPoint,
+  type ViewportRadiusCoordinates,
+  getGridRoom,
+  getNearestRooms,
+};

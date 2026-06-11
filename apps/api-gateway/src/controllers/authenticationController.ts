@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from "express";
+import type { Request, Response } from "express";
 import {
   type PostAuthenticateRequest,
   type PostAuthenticateResponse,
@@ -12,7 +12,6 @@ import { createConnectionStore } from "@repo/redis-adapter/connection";
 export const authenticate = async (
   req: Request<PostAuthenticateRequest>,
   res: Response<PostAuthenticateResponse | AppError>,
-  _next: NextFunction,
 ) => {
   const userClient = createConnectionStore({
     url: "redis://default@localhost:6379",

@@ -16,6 +16,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "lint": "eslint --max-warnings 0"
+  },
   "dependencies": {
     "@repo/contracts": "workspace:*"
   },

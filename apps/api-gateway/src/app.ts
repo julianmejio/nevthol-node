@@ -1,9 +1,4 @@
-import express, {
-  type Express,
-  type NextFunction,
-  type Request,
-  type Response,
-} from "express";
+import express, { type Express } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import authenticationRoutes from "./routes/authentication";

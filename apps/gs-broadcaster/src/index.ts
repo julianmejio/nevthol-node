@@ -5,7 +5,7 @@ import {
   PlayerPositionSchema,
 } from "@repo/contracts/pb/player_position/v1/player_position_pb.js";
 import { createValidator } from "@bufbuild/protovalidate";
-import { getGridRoom } from "@repo/utils/coordinates";
+import { getGridRoom } from "@repo/core/geo-coordinates";
 import { createRedisTransmitter } from "@repo/redis-adapter/transmitter";
 import { createConnectionStore } from "@repo/redis-adapter/connection";
 import {
@@ -27,7 +27,7 @@ import {
   PlayerPositionFlags,
 } from "@repo/contracts/player";
 import { createUserStore } from "@repo/redis-adapter/user";
-import { has } from "@repo/utils/bitmask";
+import { has } from "@repo/core/bitmask";
 import { createRedisTrailTracker } from "@repo/redis-adapter/trail";
 import { type RedisAdapterParameters } from "@repo/redis-adapter/configuration";
 
