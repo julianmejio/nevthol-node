@@ -10,6 +10,7 @@ import { createRedisTransmitter } from "@repo/redis-adapter/transmitter";
 import { createConnectionStore } from "@repo/redis-adapter/connection";
 import {
   AUTO_OFFSET_RESET,
+  CONNECTION_STORE_TTL,
   ENABLE_AUTO_COMMIT,
   FETCH_MESSAGE_MAX_BYTES,
   FETCH_MIN_BYTES,
@@ -133,7 +134,9 @@ await consumer.subscribe({
     }
     await transmitter.broadcastPosition(position);
     await connectionStore.increasePositionCount(key);
-    await connectionStore.expire(key, 86400);
+    if (CONNECTION_STORE_TTL) {
+      await connectionStore.expire(key, CONNECTION_STORE_TTL);
+    }
     if (playerConnections.get(key) !== position.position.l) {
       return;
     }

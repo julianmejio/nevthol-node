@@ -4,6 +4,7 @@ const ConfigSchema = z.object({
   LISTEN_PORT: z.coerce.number().positive().default(3001),
   MESSENGER_BROKER: z.string().default("localhost:9092"),
   STATE_STORE_URL: z.string().default("redis://default@localhost:6379"),
+  CONNECTION_STORE_TTL: z.coerce.number().positive().optional(),
   GROUP_ID: z.string().default("broadcaster-consumer"),
   FETCH_MIN_BYTES: z.coerce
     .number()
@@ -30,6 +31,7 @@ export const {
   LISTEN_PORT,
   MESSENGER_BROKER,
   STATE_STORE_URL,
+  CONNECTION_STORE_TTL,
   GROUP_ID,
   FETCH_MIN_BYTES,
   FETCH_WAIT_MAX_MS,
