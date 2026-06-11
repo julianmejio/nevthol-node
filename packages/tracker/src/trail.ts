@@ -1,5 +1,5 @@
-interface ICharacterTracker {
+interface ITrailTracker {
   addDataPoint: (characterName: string, x: number, y: number) => Promise<void>;
 }
 
-export { type ICharacterTracker };
+export { type ITrailTracker };

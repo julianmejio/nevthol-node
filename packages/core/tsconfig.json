@@ -2,11 +2,12 @@
   "extends": [
     "@tsconfig/node24/tsconfig.json",
     "@tsconfig/node-ts/tsconfig.json",
-    "@repo/typescript-config/base.json"
+    "@repo/typescript-config/base.json",
+    "@repo/typescript-config/backend-service"
   ],
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
   },
   "include": [
     "src"

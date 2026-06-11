@@ -12,6 +12,10 @@
       "types": "./src/connection.ts",
       "default": "./dist/connection.js"
     },
+    "./configuration": {
+      "types": "./src/configuration.ts",
+      "default": "./dist/configuration.js"
+    },
     "./tracker": {
       "types": "./src/character-tracker.ts",
       "default": "./dist/character-tracker.js"

@@ -53,4 +53,30 @@ const latLngToTyria = (lat: number, lng: number) => {
   return { x, y };
 };
 
-export { tyriaToLatLng, latLngToTyria };
+/**
+ * Packs the int X,Y coordinates into a binary Int32 buffer for storing and efficiency purposes. Use it to store coordinates.
+ * @param coordinates
+ * @param {number} coordinates.x Coordinate component X, ideally going from 0 to {@link MAP_TYRIA_MAX_X}
+ * @param {number} coordinates.y Coordinate component Y, ideally going from 0 to {@link MAP_TYRIA_MAX_Y}
+ * @return {Buffer} Packed binary buffer with the coordinates. Use {@link unpackCoordinates} to convert it back to x and y.
+ */
+const packCoordinates = ({ x, y }: { x: number; y: number }): Buffer => {
+  const buffer = Buffer.alloc(8);
+  buffer.writeUInt32BE(x, 0);
+  buffer.writeUInt32BE(y, 4);
+  return buffer;
+};
+
+/**
+ * Unpacks binary coordinates to x and y.
+ * @param {Buffer} buffer containing the coordinates in binary format, usually from the output of {@link packCoordinates}.
+ * @return {{number, number}} the unpacked coordinates in x and y.
+ */
+const unpackCoordinates = (buffer: Buffer): { x: number; y: number } => {
+  return {
+    x: buffer.readUInt32BE(0),
+    y: buffer.readUInt32BE(4),
+  };
+};
+
+export { tyriaToLatLng, latLngToTyria, packCoordinates, unpackCoordinates };

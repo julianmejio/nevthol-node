@@ -4,9 +4,9 @@
   "type": "module",
   "private": true,
   "exports": {
-    "./tracker": {
-      "types": "./src/tracker.ts",
-      "default": "./dist/tracker.js"
+    "./trail": {
+      "types": "./src/trail.ts",
+      "default": "./dist/trail.js"
     }
   },
   "keywords": [],
