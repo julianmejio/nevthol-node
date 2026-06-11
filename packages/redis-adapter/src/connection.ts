@@ -1,5 +1,5 @@
 import { createKeyValueStore } from "./hkv-store.js";
-import type { IInitializable } from "@repo/core/lifecycle.js";
+import type { IInitializable } from "@repo/core/lifecycle";
 import type { IConnectionStore } from "@repo/session/connection";
 
 const redisConnectionNamespace = "connections";

@@ -4,10 +4,13 @@
   "private": true,
   "description": "",
   "exports": {
-
-    "./*": {
-      "types": "./src/*",
-      "default": "./dist/*"
+    "./geo-coordinates": {
+      "types": "./src/geo-coordinates.ts",
+      "default": "./dist/geo-coordinates.js"
+    },
+    "./lifecycle": {
+      "types": "./src/lifecycle.ts",
+      "default": "./dist/lifecycle.js"
     }
   },
   "scripts": {

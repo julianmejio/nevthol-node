@@ -3,7 +3,7 @@ import {
   type IMessageConsumer,
   type IMessagePublisher,
 } from "@repo/messaging/message-broker.js";
-import { type IInitializable } from "@repo/core/lifecycle.js";
+import { type IInitializable } from "@repo/core/lifecycle";
 import { Kafka, type Message, Partitioners } from "kafkajs";
 import type { KafkaConsumerParams } from "./common.js";
 

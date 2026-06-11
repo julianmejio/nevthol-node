@@ -1,44 +1,11 @@
-import type { IInitializable } from "@repo/core/lifecycle.js";
+import type { IInitializable } from "@repo/core/lifecycle";
 import type { ICharacterTracker } from "@repo/tracker/tracker";
+import { tyriaToLatLng } from "@repo/core/geo-coordinates";
 import { createClient } from "redis";
 
 interface RedisTrackerParams {
   url: string;
 }
-
-// Define your grid constraints
-const MAX_X = 81920;
-const MAX_Y = 114688;
-
-/**
- * Converts your custom grid X/Y to fake Earth Long/Lat
- */
-function gridToGeo(x: number, y: number) {
-  // 1. Get percentage of your grid (0.0 to 1.0)
-  const pctX = x / MAX_X;
-  const pctY = y / MAX_Y;
-
-  // 2. Map X to Longitude (-180 to 180) -> Span of 360
-  const lng = -180 + pctX * 360;
-
-  // 3. Map Y to Latitude (-80 to 80) -> Span of 160 (Safely inside 85 limit)
-  const lat = -80 + pctY * 160;
-
-  return { lng, lat };
-}
-
-// /**
-//  * Converts the fake Earth Long/Lat back into your grid X/Y
-//  */
-// function geoToGrid(lng: number, lat: number) {
-//   const pctX = (lng + 180) / 360;
-//   const pctY = (lat + 80) / 160;
-//
-//   const x = Math.round(pctX * MAX_X);
-//   const y = Math.round(pctY * MAX_Y);
-//
-//   return { x, y };
-// }
 
 const getTrailHash = (characterId: string) => `track:${characterId}`;
 
@@ -67,7 +34,7 @@ const createRedisTracker = (
       buffer.writeUIntBE(x, 0, 3);
       buffer.writeUIntBE(y, 3, 3);
       const timeSpan = timestamp - 8 * 60 * 60 * 1000;
-      const converted = gridToGeo(x, y);
+      const converted = tyriaToLatLng(x, y);
       await client
         .multi()
         .geoAdd("tracking:positions", {

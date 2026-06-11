@@ -1,4 +1,4 @@
-import type { IInitializable } from "@repo/core/lifecycle.js";
+import type { IInitializable } from "@repo/core/lifecycle";
 import { createClient } from "redis";
 
 interface IStorableObject {

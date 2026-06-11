@@ -1,5 +1,5 @@
 import type { IGeoBroadcastTransmitter } from "@repo/broadcasting/geo-broadcast.js";
-import type { IInitializable } from "@repo/core/lifecycle.js";
+import type { IInitializable } from "@repo/core/lifecycle";
 import { createClient } from "redis";
 import {
   PlayerGeoPositionSchema,

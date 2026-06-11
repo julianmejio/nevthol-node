@@ -13,8 +13,8 @@
       "default": "./dist/connection.js"
     },
     "./tracker": {
-      "types": "./src/characterTracker.ts",
-      "default": "./dist/characterTracker.js"
+      "types": "./src/character-tracker.ts",
+      "default": "./dist/character-tracker.js"
     },
     "./user": {
       "types": "./src/user.ts",
