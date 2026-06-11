@@ -1,6 +1,7 @@
 import { createKeyValueStore } from "./hkv-store.js";
 import type { IInitializable } from "@repo/core/lifecycle";
 import type { IConnectionStore } from "@repo/session/connection";
+import type { RedisAdapterParameters } from "./configuration.js";
 
 const redisConnectionNamespace = "connections";
 const Fields = {
@@ -10,12 +11,8 @@ const Fields = {
   PositionCount: "position_count",
 } as const;
 
-interface RedisConnectionStoreParams {
-  url: string;
-}
-
 const createConnectionStore = (
-  params: RedisConnectionStoreParams,
+  params: RedisAdapterParameters,
 ): IInitializable & IConnectionStore => {
   const client = createKeyValueStore(params.url);
   const getSessionHash = (connectionId: string) =>
@@ -89,4 +86,4 @@ const createConnectionStore = (
   };
 };
 
-export { createConnectionStore, type RedisConnectionStoreParams };
+export { createConnectionStore };

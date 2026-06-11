@@ -67,4 +67,4 @@ const createRedisTrailTracker = (
   };
 };
 
-export { type RedisTrailTrackerParameters, createRedisTrailTracker };
+export { createRedisTrailTracker, type RedisTrailTrackerParameters };

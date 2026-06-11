@@ -5,13 +5,10 @@ import {
   PlayerGeoPositionSchema,
   type PlayerPosition,
 } from "@repo/contracts/player";
-
-export interface RedisTransmitterParams {
-  url: string;
-}
+import type { RedisAdapterParameters } from "./configuration.js";
 
 export const createRedisTransmitter = (
-  params: RedisTransmitterParams,
+  params: RedisAdapterParameters,
 ): IGeoBroadcastTransmitter & IInitializable => {
   const { url } = params;
   const redisPub = createClient({

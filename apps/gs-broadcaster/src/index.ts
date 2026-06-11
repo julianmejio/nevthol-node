@@ -6,14 +6,8 @@ import {
 } from "@repo/contracts/pb/player_position/v1/player_position_pb.js";
 import { createValidator } from "@bufbuild/protovalidate";
 import { getGridRoom } from "@repo/utils/coordinates";
-import {
-  createRedisTransmitter,
-  type RedisTransmitterParams,
-} from "@repo/redis-adapter/transmitter";
-import {
-  createConnectionStore,
-  type RedisConnectionStoreParams,
-} from "@repo/redis-adapter/connection";
+import { createRedisTransmitter } from "@repo/redis-adapter/transmitter";
+import { createConnectionStore } from "@repo/redis-adapter/connection";
 import {
   AUTO_OFFSET_RESET,
   ENABLE_AUTO_COMMIT,
@@ -23,17 +17,18 @@ import {
   GROUP_ID,
   MESSENGER_BROKER,
   QUEUED_MIN_MESSAGES,
+  STATE_STORE_URL,
+  TRAIL_MAX_STORE_POINTS,
+  TRAIL_MAX_STORE_TIME_MS,
 } from "./config.js";
 import {
   type PlayerPosition as BroadcastPlayerPosition,
   PlayerPositionFlags,
 } from "@repo/contracts/player";
 import { createUserStore } from "@repo/redis-adapter/user";
-import {
-  createRedisTracker,
-  type RedisTrackerParams,
-} from "@repo/redis-adapter/tracker";
 import { has } from "@repo/utils/bitmask";
+import { createRedisTrailTracker } from "@repo/redis-adapter/trail";
+import { type RedisAdapterParameters } from "@repo/redis-adapter/configuration";
 
 const playerConnections = new Map<string, string>();
 const validator = createValidator();
@@ -49,16 +44,18 @@ const consumer = createKafkaConsumer({
   autoOffsetReset: AUTO_OFFSET_RESET,
 });
 
-const redisParameters: RedisTransmitterParams &
-  RedisConnectionStoreParams &
-  RedisTrackerParams = {
-  url: "redis://default@localhost:6379",
+const redisParameters: RedisAdapterParameters = {
+  url: STATE_STORE_URL,
 };
 
 const transmitter = createRedisTransmitter(redisParameters);
 const connectionStore = createConnectionStore(redisParameters);
 const userStore = createUserStore(redisParameters);
-const tracker = createRedisTracker(redisParameters);
+const tracker = createRedisTrailTracker({
+  ...redisParameters,
+  TrailStoreMaxPoints: TRAIL_MAX_STORE_POINTS,
+  TrailStoreMaxTimeMs: TRAIL_MAX_STORE_TIME_MS,
+});
 
 const optionalPositionFieldsMap: Partial<
   Record<keyof PlayerPosition, keyof BroadcastPlayerPosition["position"]>

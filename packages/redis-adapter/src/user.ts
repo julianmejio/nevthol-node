@@ -5,13 +5,10 @@ import type {
   UserAttributes,
 } from "@repo/session/user";
 import { createKeyValueStore } from "./hkv-store.js";
-
-interface RedisUserStoreParams {
-  url: string;
-}
+import type { RedisAdapterParameters } from "./configuration.js";
 
 const createUserStore = (
-  params: RedisUserStoreParams,
+  params: RedisAdapterParameters,
 ): IInitializable & IUserStore => {
   const keyValueStore = createKeyValueStore(params.url);
   const getUserHash = (characterName: string) => `users:${characterName}`;
@@ -51,4 +48,4 @@ const createUserStore = (
   };
 };
 
-export { type RedisUserStoreParams, createUserStore };
+export { createUserStore };

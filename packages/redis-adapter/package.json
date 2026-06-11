@@ -16,9 +16,9 @@
       "types": "./src/configuration.ts",
       "default": "./dist/configuration.js"
     },
-    "./tracker": {
-      "types": "./src/character-tracker.ts",
-      "default": "./dist/character-tracker.js"
+    "./trail": {
+      "types": "./src/trail.ts",
+      "default": "./dist/trail.js"
     },
     "./user": {
       "types": "./src/user.ts",

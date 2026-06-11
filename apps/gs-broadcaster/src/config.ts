@@ -3,6 +3,7 @@ import { z } from "zod";
 const ConfigSchema = z.object({
   LISTEN_PORT: z.coerce.number().positive().default(3001),
   MESSENGER_BROKER: z.string().default("localhost:9092"),
+  STATE_STORE_URL: z.string().default("redis://default@localhost:6379"),
   GROUP_ID: z.string().default("broadcaster-consumer"),
   FETCH_MIN_BYTES: z.coerce
     .number()
@@ -16,6 +17,11 @@ const ConfigSchema = z.object({
   ENABLE_AUTO_COMMIT: z.coerce.boolean().default(false),
   QUEUED_MIN_MESSAGES: z.coerce.number().positive().default(500000),
   AUTO_OFFSET_RESET: z.enum(["latest", "beginning"]).default("latest"),
+  TRAIL_MAX_STORE_POINTS: z.coerce.number().positive().default(50000),
+  TRAIL_MAX_STORE_TIME_MS: z.coerce
+    .number()
+    .positive()
+    .default(8 * 60 * 60 * 1000),
 });
 
 const parseEnv = ConfigSchema.parse(process.env);
@@ -23,6 +29,7 @@ const parseEnv = ConfigSchema.parse(process.env);
 export const {
   LISTEN_PORT,
   MESSENGER_BROKER,
+  STATE_STORE_URL,
   GROUP_ID,
   FETCH_MIN_BYTES,
   FETCH_WAIT_MAX_MS,
@@ -30,4 +37,6 @@ export const {
   ENABLE_AUTO_COMMIT,
   QUEUED_MIN_MESSAGES,
   AUTO_OFFSET_RESET,
+  TRAIL_MAX_STORE_POINTS,
+  TRAIL_MAX_STORE_TIME_MS,
 } = parseEnv;
