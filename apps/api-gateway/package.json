@@ -17,6 +17,7 @@
     "@repo/gw2api-adapter": "workspace:*",
     "@repo/redis-adapter": "workspace:*",
     "@repo/authentication": "workspace:*",
+    "@repo/logger": "workspace:*",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "helmet": "^8.2.0",

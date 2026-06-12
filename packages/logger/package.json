@@ -1,0 +1,35 @@
+{
+  "name": "@repo/logger",
+  "type": "module",
+  "private": true,
+  "description": "",
+  "exports": {
+    ".": {
+      "import": "./src/logger.ts",
+      "default": "./src/logger.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint --max-warnings 0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@repo/vitest-config": "workspace:*",
+    "@tsconfig/node-ts": "^23.6.4",
+    "@tsconfig/node24": "^24.0.4",
+    "@types/node": "^22.19.19",
+    "eslint": "^9.39.4",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "pino": "^10.3.1",
+    "pino-http": "^11.0.0",
+    "pino-pretty": "^13.1.3"
+  }
+}

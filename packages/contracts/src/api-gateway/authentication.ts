@@ -1,5 +1,9 @@
 import { z } from "zod";
 import { AppErrorSchema } from "../error.js";
+import {
+  BaseErrorApiResponseSchema,
+  BaseSuccessResponseSchema,
+} from "./response-common.js";
 
 /**
  * Schema that supports and validates Guild Wars 2 API key subtokens.
@@ -30,25 +34,11 @@ export type PostAuthenticateRequest = z.infer<
   typeof PostAuthenticateRequestSchema
 >;
 
-/**
- * Schema that validates the POST authentication response from the API.
- */
-const PostAuthenticateResponseSchema = z.union([
-  z
-    .object({
-      /** Status of the response. */
-      status: z
-        .literal("success")
-        .describe(
-          "`status: success` indicating a successful authentication response",
-        ),
-      /** JWT token to be used for authentication. */
-      token: z
-        .jwt()
-        .describe("JWT token to be used for authenticating against the system"),
-    })
-    .describe("Successful authentication response"),
-  AppErrorSchema,
+export const PostAuthenticateResponseSchema = z.discriminatedUnion("status", [
+  BaseSuccessResponseSchema.extend({
+    token: z.jwt().describe("JWT token for authenticating against the ws"),
+  }),
+  BaseErrorApiResponseSchema,
 ]);
 
 /**

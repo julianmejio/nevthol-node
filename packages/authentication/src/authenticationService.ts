@@ -4,7 +4,7 @@ import {
   PostAuthenticateRequestSchema,
   type PostAuthenticateResponse,
 } from "@repo/contracts/api-gateway/authentication";
-import { type AppError, AppErrorCode } from "@repo/contracts/error";
+import { AppErrorCode } from "@repo/contracts/error";
 import { Gw2ApiTokenInfoSchema } from "@repo/contracts/gw2/v2";
 import jwt, { type SignOptions } from "jsonwebtoken";
 import { nanoid } from "nanoid";
@@ -15,7 +15,7 @@ interface IAuthenticationService {
     request: PostAuthenticateRequest,
     privateKey: string,
     metaDataJwt?: Partial<Pick<SignOptions, "issuer" | "audience" | "subject">>,
-  ) => Promise<PostAuthenticateResponse | AppError>;
+  ) => Promise<PostAuthenticateResponse>;
   isValidGw2Token: (gw2Token: string) => Promise<boolean>;
   getCharacterList: (gw2Token: string) => Promise<string[] | null>;
   signJwt: <T extends object>(
@@ -87,18 +87,20 @@ const createAuthenticationService = (
       metaDataJwt: Partial<
         Pick<SignOptions, "issuer" | "audience" | "subject">
       > = {},
-    ): Promise<PostAuthenticateResponse | AppError> => {
+    ): Promise<PostAuthenticateResponse> => {
       const requestValidation =
         PostAuthenticateRequestSchema.safeParse(request);
       if (!requestValidation.success) {
         console.debug(requestValidation.error);
         return {
+          status: "error",
           errorCode: AppErrorCode.AUTHENTICATION_GENERIC_ERROR,
           message: "Authentication request is malformed",
         };
       }
       if (!(await isValidGw2Token(requestValidation.data.gw2token))) {
         return {
+          status: "error",
           errorCode: AppErrorCode.AUTHENTICATION_GENERIC_ERROR,
           message: "Token is not valid",
         };
@@ -108,6 +110,7 @@ const createAuthenticationService = (
       );
       if (null === characterList) {
         return {
+          status: "error",
           errorCode: AppErrorCode.GW2_ACCOUNT_INVALID_CHARACTER_LIST,
           message:
             "No valid character list (or no characters at all) have been found. Have you forgotten 'characters' permission? Try with an account with at least one character",
@@ -122,6 +125,7 @@ const createAuthenticationService = (
         );
         if (null === jwt) {
           return {
+            status: "error",
             errorCode: AppErrorCode.AUTHENTICATION_GENERIC_ERROR,
             message: "Could not generate an authentication token",
           };
@@ -134,6 +138,7 @@ const createAuthenticationService = (
         };
       } catch {
         return {
+          status: "error",
           errorCode: AppErrorCode.AUTHENTICATION_GENERIC_ERROR,
           message: "An error occurred when tried to authenticate the user",
         };

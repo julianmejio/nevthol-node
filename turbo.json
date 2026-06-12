@@ -1,5 +1,6 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
+  "globalEnv": ["NODE_ENV", "INSTANCE_ID", "LOG_LEVEL"],
   "ui": "tui",
   "tasks": {
     "build": {
