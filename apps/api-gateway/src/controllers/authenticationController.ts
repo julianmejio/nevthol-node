@@ -4,7 +4,7 @@ import {
   type PostAuthenticateResponse,
 } from "@repo/contracts/api-gateway/authentication";
 import { createAccountClient } from "@repo/gw2api-adapter/account";
-import { type AppError, AppErrorCode } from "@repo/contracts/error";
+import { AppErrorCode } from "@repo/contracts/error";
 import { JWT_PRIVATE_KEY } from "../config";
 import { createAuthenticationService } from "@repo/authentication/authentication-service";
 import { createConnectionStore } from "@repo/redis-adapter/connection";
@@ -12,7 +12,7 @@ import type { BaseErrorApiResponse } from "@repo/contracts/api-gateway/response-
 
 export const authenticate = async (
   req: Request<PostAuthenticateRequest>,
-  res: Response<PostAuthenticateResponse | AppError>,
+  res: Response<PostAuthenticateResponse>,
   next: NextFunction,
 ) => {
   const userClient = createConnectionStore({
