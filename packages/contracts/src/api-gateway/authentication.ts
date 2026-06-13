@@ -1,15 +1,29 @@
 import { z } from "zod";
-import { AppErrorSchema } from "../error.js";
 import {
   BaseErrorApiResponseSchema,
   BaseSuccessResponseSchema,
 } from "./response-common.js";
 
 /**
+ * List of properties that an authentication badge (JWT or cookie) contains.
+ */
+const AuthenticationAttributesSchema = z.object({
+  /** Comma-separated list of character names. */
+  chl: z
+    .string()
+    .regex(/^\p{Lu}\p{Ll}*(?:[\s,]\p{Lu}\p{Ll}*)*$/u)
+    .describe("Comma-separated list of character names"),
+});
+/**
+ * List of properties that an authentication badge (JWT or cookie) contains.
+ */
+type AuthenticationAttributes = z.infer<typeof AuthenticationAttributesSchema>;
+
+/**
  * Schema that supports and validates Guild Wars 2 API key subtokens.
  * @see [GW2 API subtoken creation]{@link https://wiki.guildwars2.com/wiki/API:2/createsubtoken}.
  */
-export const PostAuthenticateRequestSchema = z
+const PostAuthenticateRequestSchema = z
   .object({
     /** GW2 API token, either a key or a subtoken */
     gw2token: z
@@ -30,11 +44,9 @@ export const PostAuthenticateRequestSchema = z
  * Schema that supports and validates Guild Wars 2 API key subtokens.
  * @see [GW2 API subtoken creation]{@link https://wiki.guildwars2.com/wiki/API:2/createsubtoken}.
  */
-export type PostAuthenticateRequest = z.infer<
-  typeof PostAuthenticateRequestSchema
->;
+type PostAuthenticateRequest = z.infer<typeof PostAuthenticateRequestSchema>;
 
-export const PostAuthenticateResponseSchema = z.discriminatedUnion("status", [
+const PostAuthenticateResponseSchema = z.discriminatedUnion("status", [
   BaseSuccessResponseSchema.extend({
     token: z.jwt().describe("JWT token for authenticating against the ws"),
   }),
@@ -44,6 +56,13 @@ export const PostAuthenticateResponseSchema = z.discriminatedUnion("status", [
 /**
  * Schema that validates the POST authentication response from the API.
  */
-export type PostAuthenticateResponse = z.infer<
-  typeof PostAuthenticateResponseSchema
->;
+type PostAuthenticateResponse = z.infer<typeof PostAuthenticateResponseSchema>;
+
+export {
+  AuthenticationAttributesSchema,
+  PostAuthenticateRequestSchema,
+  PostAuthenticateResponseSchema,
+  type AuthenticationAttributes,
+  type PostAuthenticateRequest,
+  type PostAuthenticateResponse,
+};

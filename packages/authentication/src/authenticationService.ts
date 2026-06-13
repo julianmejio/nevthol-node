@@ -1,5 +1,6 @@
 import type { IAccountClient } from "@repo/game-api/account";
 import {
+  type AuthenticationAttributes,
   type PostAuthenticateRequest,
   PostAuthenticateRequestSchema,
   type PostAuthenticateResponse,
@@ -8,7 +9,6 @@ import { AppErrorCode } from "@repo/contracts/error";
 import { Gw2ApiTokenInfoSchema } from "@repo/contracts/gw2/v2";
 import jwt, { type SignOptions } from "jsonwebtoken";
 import { nanoid } from "nanoid";
-import type { IConnectionStore } from "@repo/session/connection";
 
 interface IAuthenticationService {
   getAuthenticationJwtByGw2ApiKey: (
@@ -27,7 +27,6 @@ interface IAuthenticationService {
 
 const createAuthenticationService = (
   accountClient: IAccountClient,
-  connectionStore: IConnectionStore,
 ): IAuthenticationService => {
   const isValidGw2Token = async (gw2Token: string) => {
     try {
@@ -118,9 +117,9 @@ const createAuthenticationService = (
       }
       try {
         const connectionId = nanoid(10);
-        const jwt = signJwt(
+        const jwt = signJwt<AuthenticationAttributes>(
           privateKey,
-          {},
+          { chl: characterList.join(",") },
           { ...metaDataJwt, jwtid: connectionId },
         );
         if (null === jwt) {
@@ -130,8 +129,6 @@ const createAuthenticationService = (
             message: "Could not generate an authentication token",
           };
         }
-        await connectionStore.setAllowedCharacters(connectionId, characterList);
-        await connectionStore.expire(connectionId, 15);
         return {
           status: "success",
           token: jwt,

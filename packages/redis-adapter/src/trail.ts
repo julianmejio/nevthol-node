@@ -64,6 +64,9 @@ const createRedisTrailTracker = (
         )
         .exec();
     },
+    removeCharacterPosition: async (characterName: string) => {
+      await client.zRem(REDIS_NAMESPACE_TRACKING_POSITIONS, characterName);
+    },
   };
 };
 

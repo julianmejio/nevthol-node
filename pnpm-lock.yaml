@@ -32,9 +32,6 @@ importers:
       '@repo/logger':
         specifier: workspace:*
         version: link:../../packages/logger
-      '@repo/redis-adapter':
-        specifier: workspace:*
-        version: link:../../packages/redis-adapter
       cors:
         specifier: ^2.8.6
         version: 2.8.6
@@ -154,6 +151,9 @@ importers:
       '@repo/session':
         specifier: workspace:*
         version: link:../../packages/session
+      '@repo/tracker':
+        specifier: workspace:*
+        version: link:../../packages/tracker
       '@repo/vitest-config':
         specifier: workspace:*
         version: link:../../packages/vitest-config
@@ -331,9 +331,6 @@ importers:
       '@repo/gw2api-adapter':
         specifier: workspace:*
         version: link:../gw2api-adapter
-      '@repo/session':
-        specifier: workspace:*
-        version: link:../session
       jsonwebtoken:
         specifier: ^9.0.3
         version: 9.0.3

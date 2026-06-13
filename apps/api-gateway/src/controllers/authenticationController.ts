@@ -7,7 +7,6 @@ import { createAccountClient } from "@repo/gw2api-adapter/account";
 import { AppErrorCode } from "@repo/contracts/error";
 import { JWT_PRIVATE_KEY } from "../config";
 import { createAuthenticationService } from "@repo/authentication/authentication-service";
-import { createConnectionStore } from "@repo/redis-adapter/connection";
 import type { BaseErrorApiResponse } from "@repo/contracts/api-gateway/response-common";
 
 export const authenticate = async (
@@ -15,13 +14,8 @@ export const authenticate = async (
   res: Response<PostAuthenticateResponse>,
   next: NextFunction,
 ) => {
-  const userClient = createConnectionStore({
-    url: "redis://default@localhost:6379",
-  });
-  await userClient.connect();
   const authenticationService = createAuthenticationService(
     createAccountClient(),
-    userClient,
   );
   try {
     const response =

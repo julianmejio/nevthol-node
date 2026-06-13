@@ -15,6 +15,9 @@ import {
 } from "./config";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import type { IConnectionStore } from "@repo/session/connection";
+import type { AuthenticationAttributes } from "@repo/contracts/api-gateway/authentication";
+import type { ITrailTracker } from "@repo/tracker/trail";
+import type { IUserStore } from "@repo/session/user";
 
 const validator = createValidator();
 
@@ -27,6 +30,8 @@ export interface ServerParams {
   listeningPort?: number;
   messenger: IMessagePublisher;
   store: IConnectionStore;
+  tracker: ITrailTracker;
+  userStore: IUserStore;
   maxPayloadLength?: number;
   maxBufferedAmountPerConnection?: number;
   topicName: string;
@@ -40,6 +45,8 @@ export const createServer = ({
   listeningPort = LISTEN_PORT,
   messenger,
   store,
+  tracker,
+  userStore,
   maxPayloadLength = MAX_PAYLOAD_LENGTH,
   maxBufferedAmountPerConnection = MAX_BUFFERED_AMOUNT_PER_CONNECTION,
   topicName,
@@ -49,24 +56,51 @@ export const createServer = ({
     maxPayloadLength: maxPayloadLength,
     upgrade: (res, req, context) => {
       try {
+        const websocketKey = req.getHeader("sec-websocket-key");
+        const websocketProtocol = req.getHeader("sec-websocket-protocol");
+        const websocketExtensions = req.getHeader("sec-websocket-extensions");
         const jwtToken = req.getHeader("authorization").replace("Bearer ", "");
+        console.debug("Token", jwtToken);
         const jwtVerification = jwt.verify(
           jwtToken,
           JWT_PUBLIC_KEY,
-        ) as JwtPayload;
+        ) as JwtPayload & AuthenticationAttributes;
+        const connectionId = jwtVerification["jti"] as string;
         const userData: WebSocketUserData = {
-          connectionId: jwtVerification["jti"] as string,
+          connectionId: connectionId,
         };
-        res.upgrade(
-          userData,
-          req.getHeader("sec-websocket-key"),
-          req.getHeader("sec-websocket-protocol"),
-          req.getHeader("sec-websocket-extensions"),
-          context,
-        );
+        let aborted = false;
+        res.onAborted(() => (aborted = true));
+        store
+          .setAllowedCharacters(connectionId, jwtVerification["chl"].split(","))
+          .then(() => {
+            if (aborted) {
+              store.delete(connectionId).then();
+              return;
+            }
+            res.cork(() => {
+              res.upgrade(
+                userData,
+                websocketKey,
+                websocketProtocol,
+                websocketExtensions,
+                context,
+              );
+              console.debug("Connection upgraded", connectionId);
+            });
+          })
+          .catch((err) => {
+            console.error("Error in socket creation", err);
+            store.delete(connectionId).then();
+            res.cork(() => {
+              res.writeStatus("500 Internal Server Error").end();
+            });
+          });
       } catch (error) {
         console.error("An error occurred when upgrading the connection", error);
-        res.writeStatus("401 Unauthorized").end("Invalid connection");
+        res.cork(() => {
+          res.writeStatus("401 Unauthorized").end("Invalid connection");
+        });
       }
     },
     open: (ws: WebSocket<WebSocketUserData>) => {
@@ -120,6 +154,9 @@ export const createServer = ({
     close: async (ws: WebSocket<WebSocketUserData>, code, message) => {
       const decoder = new TextDecoder("utf-8");
       const { connectionId } = ws.getUserData();
+      const currentCharacter = await store.getCurrentCharacter(connectionId);
+      await tracker.removeCharacterPosition(currentCharacter as string);
+      await userStore.deleteUser(currentCharacter as string);
       await store.delete(connectionId);
       console.log(
         `Client disconnected (${code}).`,

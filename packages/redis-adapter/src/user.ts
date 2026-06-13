@@ -31,7 +31,7 @@ const createUserStore = (
       characterName: string,
       data: Partial<UserAttributeCollection>,
     ) => {
-      await keyValueStore.setMultiple(getUserHash(characterName), data, 120);
+      await keyValueStore.setMultiple(getUserHash(characterName), data, 300);
     },
     getAttribute: async <T extends string | number>(
       characterName: string,

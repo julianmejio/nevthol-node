@@ -35,6 +35,7 @@
     "@bufbuild/protovalidate": "^1.2.0",
     "@repo/contracts": "workspace:*",
     "@repo/session": "workspace:*",
+    "@repo/tracker": "workspace:*",
     "@repo/redis-adapter": "workspace:*",
     "@repo/core": "workspace:*",
     "@repo/vitest-config": "workspace:*",

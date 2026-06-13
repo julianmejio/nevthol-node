@@ -13,6 +13,8 @@ import process from "node:process";
 import { us_listen_socket_close } from "uWebSockets.js";
 import { createKafkaPublisher } from "@repo/kafka-adapter/node-rdkafka";
 import { createConnectionStore } from "@repo/redis-adapter/connection";
+import { createRedisTrailTracker } from "@repo/redis-adapter/trail";
+import { createUserStore } from "@repo/redis-adapter/user";
 
 // Hardcoded as this is part of the internal versioning
 const topicName: string = "player-position-v1";
@@ -33,10 +35,22 @@ const bootstrap = async (): Promise<void> => {
     const store = createConnectionStore({
       url: "redis://default@localhost:6379",
     });
+    const tracker = createRedisTrailTracker({
+      url: "redis://default@localhost:6379",
+      TrailStoreMaxTimeMs: 0,
+      TrailStoreMaxPoints: 0,
+    });
+    const userStore = createUserStore({
+      url: "redis://default@localhost:6379",
+    });
     await store.connect();
+    await tracker.connect();
+    await userStore.connect();
     const { token } = await createServer({
       messenger,
       store,
+      tracker,
+      userStore,
       topicName,
       listeningPort: LISTEN_PORT,
     });
