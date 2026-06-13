@@ -5,28 +5,27 @@
   "description": "",
   "exports": {
     "./transmitter": {
-      "types": "./src/transmitter.ts",
-      "default": "./dist/transmitter.js"
+      "import": "./src/transmitter.ts",
+      "default": "./src/transmitter.ts"
     },
     "./connection": {
-      "types": "./src/connection.ts",
-      "default": "./dist/connection.js"
+      "import": "./src/connection.ts",
+      "default": "./src/connection.ts"
     },
     "./configuration": {
-      "types": "./src/configuration.ts",
-      "default": "./dist/configuration.js"
+      "import": "./src/configuration.ts",
+      "default": "./src/configuration.ts"
     },
     "./trail": {
-      "types": "./src/trail.ts",
-      "default": "./dist/trail.js"
+      "import": "./src/trail.ts",
+      "default": "./src/trail.ts"
     },
     "./user": {
-      "types": "./src/user.ts",
-      "default": "./dist/user.js"
+      "import": "./src/user.ts",
+      "default": "./src/user.ts"
     }
   },
   "scripts": {
-    "build": "tsc",
     "check-types": "tsc --noEmit",
     "lint": "eslint --max-warnings 0"
   },

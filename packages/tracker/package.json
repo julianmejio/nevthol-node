@@ -5,8 +5,8 @@
   "private": true,
   "exports": {
     "./trail": {
-      "types": "./src/trail.ts",
-      "default": "./dist/trail.js"
+      "import": "./src/trail.ts",
+      "default": "./src/trail.ts"
     }
   },
   "scripts": {

@@ -8,9 +8,9 @@
     "lint": "eslint --max-warnings 0"
   },
   "exports": {
-    "./*": {
-      "types": "./src/*",
-      "default": "./dist/*"
+    "./geo-broadcast": {
+      "import": "./src/geo-broadcast.ts",
+      "default": "./src/geo-broadcast.ts"
     }
   },
   "keywords": [],

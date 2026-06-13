@@ -5,8 +5,8 @@
   "private": true,
   "exports": {
     "./account": {
-      "types": "./src/account.ts",
-      "default": "./dist/account.js"
+      "import": "./src/account.ts",
+      "default": "./src/account.ts"
     }
   },
   "scripts": {

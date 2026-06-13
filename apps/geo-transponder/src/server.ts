@@ -6,7 +6,7 @@ import uWS, {
 import { PlayerPositionSchema } from "@repo/contracts/pb/player_position/v1/player_position_pb.js";
 import { fromBinary } from "@bufbuild/protobuf";
 import { createValidator } from "@bufbuild/protovalidate";
-import type { IMessagePublisher } from "@repo/messaging/message-broker.js";
+import type { IMessagePublisher } from "@repo/messaging/message-broker";
 import {
   JWT_PUBLIC_KEY,
   LISTEN_PORT,

@@ -1,4 +1,4 @@
-import type { IGeoBroadcastTransmitter } from "@repo/broadcasting/geo-broadcast.js";
+import type { IGeoBroadcastTransmitter } from "@repo/broadcasting/geo-broadcast";
 import type { IInitializable } from "@repo/core/lifecycle";
 import { createClient } from "redis";
 import {

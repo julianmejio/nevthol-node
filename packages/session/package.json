@@ -5,12 +5,12 @@
   "private": true,
   "exports": {
     "./connection": {
-      "types": "./src/connection.ts",
-      "default": "./dist/connection.js"
+      "import": "./src/connection.ts",
+      "default": "./src/connection.ts"
     },
     "./user": {
-      "types": "./src/user.ts",
-      "default": "./dist/user.js"
+      "import": "./src/user.ts",
+      "default": "./src/user.ts"
     }
   },
   "keywords": [],

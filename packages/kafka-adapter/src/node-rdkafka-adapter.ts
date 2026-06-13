@@ -3,7 +3,7 @@ import type {
   ConsumerParams,
   IMessageConsumer,
   IMessagePublisher,
-} from "@repo/messaging/message-broker.js";
+} from "@repo/messaging/message-broker";
 import Kafka, { type ConsumerTopicConfig } from "node-rdkafka";
 import type {
   KafkaCommonAdapterParams,

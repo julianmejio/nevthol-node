@@ -5,20 +5,19 @@
   "description": "",
   "exports": {
     "./geo-coordinates": {
-      "types": "./src/geo-coordinates.ts",
-      "default": "./dist/geo-coordinates.js"
+      "import": "./src/geo-coordinates.ts",
+      "default": "./src/geo-coordinates.ts"
     },
     "./lifecycle": {
-      "types": "./src/lifecycle.ts",
-      "default": "./dist/lifecycle.js"
+      "import": "./src/lifecycle.ts",
+      "default": "./src/lifecycle.ts"
     },
     "./bitmask": {
-      "types": "./src/bitmask.ts",
-      "default": "./dist/bitmask.js"
+      "import": "./src/bitmask.ts",
+      "default": "./src/bitmask.ts"
     }
   },
   "scripts": {
-    "build": "tsc",
     "check-types": "tsc --noEmit",
     "lint": "eslint --max-warnings 0"
   },

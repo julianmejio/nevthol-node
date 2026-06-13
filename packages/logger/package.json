@@ -6,11 +6,10 @@
   "exports": {
     ".": {
       "import": "./src/logger.ts",
-      "default": "./src/logger.js"
+      "default": "./src/logger.ts"
     }
   },
   "scripts": {
-    "build": "tsc",
     "check-types": "tsc --noEmit",
     "lint": "eslint --max-warnings 0"
   },

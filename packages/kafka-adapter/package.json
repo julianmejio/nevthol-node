@@ -5,20 +5,19 @@
   "description": "",
   "exports": {
     "./kafkajs": {
-      "types": "./src/kafkajs-adapter.ts",
-      "default": "./dist/kafkajs-adapter.js"
+      "import": "./src/kafkajs-adapter.ts",
+      "default": "./src/kafkajs-adapter.ts"
     },
     "./node-rdkafka": {
-      "types": "./src/node-rdkafka-adapter.ts",
-      "default": "./dist/node-rdkafka-adapter.js"
+      "import": "./src/node-rdkafka-adapter.ts",
+      "default": "./src/node-rdkafka-adapter.ts"
     },
     "./common": {
-      "types": "./src/common.ts",
-      "default": "./dist/common.js"
+      "import": "./src/common.ts",
+      "default": "./src/common.ts"
     }
   },
   "scripts": {
-    "build": "tsc",
     "check-types": "tsc --noEmit",
     "lint": "eslint --max-warnings 0"
   },

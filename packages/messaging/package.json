@@ -5,13 +5,12 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./*": {
-      "types": "./src/*",
-      "default": "./dist/*"
+    "./message-broker": {
+      "import": "./src/message-broker.ts",
+      "default": "./src/message-broker.ts"
     }
   },
   "scripts": {
-    "build": "tsc",
     "check-types": "tsc --noEmit",
     "lint": "eslint --max-warnings 0"
   },
