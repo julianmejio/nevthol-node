@@ -8,8 +8,13 @@ const logger = createLogger({ serviceName });
 const app = createExpress({ logger });
 
 try {
-  app.listen(LISTEN_PORT, () => {
+  const api = app.listen(LISTEN_PORT, () => {
     logger.debug("API gateway started", { port: LISTEN_PORT });
+  });
+  process.on("SIGINT", () => {
+    api.close(() => {
+      logger.debug("API gateway shutdown", { port: LISTEN_PORT });
+    });
   });
 } catch (error) {
   logger.critical(

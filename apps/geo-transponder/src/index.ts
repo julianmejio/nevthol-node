@@ -56,7 +56,7 @@ const bootstrap = async (): Promise<void> => {
     });
     console.log("GEO transponder is listening on port ", LISTEN_PORT);
 
-    process.on("SIGTERM", async () => {
+    process.on("SIGINT", async () => {
       console.log("Closing GEO transponder...");
       us_listen_socket_close(token);
       await messenger.disconnect();

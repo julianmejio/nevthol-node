@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "esbuild src/index.ts --bundle --format=esm --packages=external --external:uWebSockets.js --platform=node --target=node24 --minify --outfile=dist/index.js",
-    "dev": "[ -f .env ] && tsx --env-file=.env --watch src/index.ts || tsx --watch src/index.ts",
+    "dev": "tsx --env-file-if-exists=.env src/index.ts",
     "clientTest": "tsx --watch src/testws.ts",
     "test": "vitest run .",
     "check-types": "tsc --noEmit",

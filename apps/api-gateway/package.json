@@ -8,7 +8,7 @@
   "scripts": {
     "check-types": "tsc --noEmit",
     "lint": "eslint --max-warnings 0",
-    "dev": "[ -f .env ] && tsx --env-file=.env --watch src/index.ts || tsx --watch src/index.ts"
+    "dev": "tsx --env-file-if-exists=.env src/index.ts"
   },
   "keywords": [],
   "author": "",
