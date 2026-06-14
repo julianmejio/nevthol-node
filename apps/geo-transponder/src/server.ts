@@ -72,7 +72,11 @@ export const createServer = ({
         let aborted = false;
         res.onAborted(() => (aborted = true));
         store
-          .setAllowedCharacters(connectionId, jwtVerification["chl"].split(","))
+          .setup(
+            connectionId,
+            jwtVerification["chl"].split(","),
+            jwtVerification["aut"],
+          )
           .then(() => {
             if (aborted) {
               store.delete(connectionId).then();

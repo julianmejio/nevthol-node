@@ -1,3 +1,5 @@
+import type { AuthenticationLevelEnum } from "@repo/contracts/api-gateway/authentication";
+
 interface IConnectionStore {
   register: (connectionId: string, ttl?: number) => Promise<void>;
   persist: (connectionId: string) => Promise<void>;
@@ -14,6 +16,11 @@ interface IConnectionStore {
   ) => Promise<void>;
   getCurrentCharacter: (connectionId: string) => Promise<string | null>;
   increasePositionCount: (connectionId: string) => Promise<number>;
+  setup: (
+    connectionId: string,
+    allowedCharacters: string[],
+    authenticationLevel: AuthenticationLevelEnum,
+  ) => Promise<void>;
   delete: (connectionId: string) => Promise<void>;
 }
 
