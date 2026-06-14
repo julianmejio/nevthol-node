@@ -5,6 +5,27 @@ import {
 } from "./response-common.js";
 
 /**
+ * Levels of authentication
+ */
+const AuthenticationLevel = {
+  /** The client has been authenticated using a key that has not been verified. */
+  Authenticated: 0,
+  /** The client has been authenticated using a verified key that demonstrates ownership. */
+  Verified: 1,
+} as const;
+
+/**
+ * Levels of authentication.
+ */
+const AuthenticationLevelEnum = z
+  .enum(AuthenticationLevel)
+  .describe("Authentication levels");
+/**
+ * Levels of authentication.
+ */
+type AuthenticationLevelEnum = z.infer<typeof AuthenticationLevelEnum>;
+
+/**
  * List of properties that an authentication badge (JWT or cookie) contains.
  */
 const AuthenticationAttributesSchema = z.object({
@@ -13,6 +34,7 @@ const AuthenticationAttributesSchema = z.object({
     .string()
     .regex(/^\p{Lu}\p{Ll}*(?:[\s,]\p{Lu}\p{Ll}*)*$/u)
     .describe("Comma-separated list of character names"),
+  aut: AuthenticationLevelEnum,
 });
 /**
  * List of properties that an authentication badge (JWT or cookie) contains.
@@ -59,6 +81,8 @@ const PostAuthenticateResponseSchema = z.discriminatedUnion("status", [
 type PostAuthenticateResponse = z.infer<typeof PostAuthenticateResponseSchema>;
 
 export {
+  AuthenticationLevel,
+  AuthenticationLevelEnum,
   AuthenticationAttributesSchema,
   PostAuthenticateRequestSchema,
   PostAuthenticateResponseSchema,

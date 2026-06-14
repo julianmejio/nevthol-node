@@ -1,6 +1,7 @@
 import type { IAccountClient } from "@repo/game-api/account";
 import {
   type AuthenticationAttributes,
+  AuthenticationLevel,
   type PostAuthenticateRequest,
   PostAuthenticateRequestSchema,
   type PostAuthenticateResponse,
@@ -119,7 +120,12 @@ const createAuthenticationService = (
         const connectionId = nanoid(10);
         const jwt = signJwt<AuthenticationAttributes>(
           privateKey,
-          { chl: characterList.join(",") },
+          {
+            chl: characterList.join(","),
+            // Hardcoded authentication level
+            // TODO: Verification mechanism.
+            aut: AuthenticationLevel.Authenticated,
+          },
           { ...metaDataJwt, jwtid: connectionId },
         );
         if (null === jwt) {
