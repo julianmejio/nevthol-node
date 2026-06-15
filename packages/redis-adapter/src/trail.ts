@@ -50,7 +50,7 @@ const createRedisTrailTracker = (
         })
         .expire(
           getNamespace(REDIS_NAMESPACE_TRACKING_USERS, characterName),
-          86400,
+          Math.floor(params.TrailStoreMaxTimeMs / 1000),
         )
         .zRemRangeByRank(
           getNamespace(REDIS_NAMESPACE_TRACKING_USERS, characterName),
