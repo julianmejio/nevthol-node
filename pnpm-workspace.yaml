@@ -1,3 +1,15 @@
 packages:
   - "apps/*"
   - "packages/*"
+allowBuilds:
+  '@bufbuild/buf': true
+  cpu-features: true
+  esbuild: true
+  node-rdkafka: true
+  protobufjs: true
+  sharp: true
+  ssh2: true
+catalog:
+  eslint: "^10.5.0"
+overrides:
+  eslint: "^9.0.0"

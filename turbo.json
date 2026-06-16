@@ -16,7 +16,7 @@
       "dependsOn": ["^lint"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^check-types", "^generate"]
     },
     "dev": {
       "cache": false,

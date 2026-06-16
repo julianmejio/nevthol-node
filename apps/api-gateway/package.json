@@ -14,9 +14,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@repo/authentication": "workspace:*",
     "@repo/contracts": "workspace:*",
     "@repo/gw2api-adapter": "workspace:*",
-    "@repo/authentication": "workspace:*",
     "@repo/logger": "workspace:*",
     "cors": "^2.8.6",
     "express": "^5.2.1",
@@ -28,6 +28,7 @@
   "devDependencies": {
     "@repo/game-api": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@repo/eslint-config": "workspace:*",
     "@tsconfig/node-ts": "^23.6.4",
     "@tsconfig/node24": "^24.0.4",
     "@tsconfig/recommended": "^1.0.13",
@@ -35,10 +36,11 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^22.19.19",
-    "esbuild": "^0.28.0",
+    "@types/node": "^25.9.3",
+    "esbuild": "^0.28.1",
     "esbuild-register": "^3.6.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.6"
+    "vitest": "^4.1.8",
+    "eslint": "catalog:"
   }
 }

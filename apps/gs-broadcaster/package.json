@@ -13,27 +13,28 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@repo/eslint-config": "workspace:*",
     "@tsconfig/node-ts": "^23.6.4",
     "@tsconfig/node24": "^24.0.4",
-    "@types/node": "^22.19.19",
-    "@repo/typescript-config": "workspace:*",
-    "esbuild": "^0.28.0",
-    "eslint": "^9.39.4",
-    "testcontainers": "^11.14.0",
+    "@types/node": "^25.9.3",
+    "esbuild": "^0.28.1",
+    "eslint": "catalog:",
+    "testcontainers": "^12.0.2",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.6"
+    "vitest": "^4.1.8"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.12.0",
     "@bufbuild/protovalidate": "^1.2.0",
     "@repo/broadcasting": "workspace:*",
     "@repo/contracts": "workspace:*",
+    "@repo/core": "workspace:*",
     "@repo/kafka-adapter": "workspace:*",
     "@repo/messaging": "workspace:*",
+    "@repo/redis-adapter": "workspace:*",
     "@repo/session": "workspace:*",
     "@repo/tracker": "workspace:*",
-    "@repo/redis-adapter": "workspace:*",
-    "@repo/core": "workspace:*",
     "kafkajs": "^2.2.4",
     "zod": "^4.4.3"
   }

@@ -17,16 +17,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@repo/core": "workspace:*",
-    "@repo/contracts": "workspace:*"
+    "@repo/contracts": "workspace:*",
+    "@repo/core": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@tsconfig/node-ts": "^23.6.4",
     "@tsconfig/node24": "^24.0.4",
-    "@types/node": "^22.19.19",
-    "eslint": "^9.39.4",
+    "@types/node": "^25.9.3",
+    "eslint": "catalog:",
     "typescript": "^6.0.3"
   }
 }
