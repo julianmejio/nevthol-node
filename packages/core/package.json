@@ -5,21 +5,22 @@
   "description": "",
   "exports": {
     "./geo-coordinates": {
-      "import": "./src/geo-coordinates.ts",
-      "default": "./src/geo-coordinates.ts"
+      "types": "./dist/geo-coordinates.d.ts",
+      "import": "./dist/geo-coordinates.js"
     },
     "./lifecycle": {
-      "import": "./src/lifecycle.ts",
-      "default": "./src/lifecycle.ts"
+      "types": "./dist/lifecycle.d.ts",
+      "import": "./dist/lifecycle.js"
     },
     "./bitmask": {
-      "import": "./src/bitmask.ts",
-      "default": "./src/bitmask.ts"
+      "types": "./dist/bitmask.d.ts",
+      "import": "./dist/bitmask.js"
     }
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "lint": "eslint --max-warnings 0"
+    "lint": "eslint --max-warnings 0",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",

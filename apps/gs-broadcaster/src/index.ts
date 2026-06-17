@@ -3,7 +3,7 @@ import { fromBinary } from "@bufbuild/protobuf";
 import {
   type PlayerPosition,
   PlayerPositionSchema,
-} from "@repo/contracts/pb/player_position/v1/player_position_pb.js";
+} from "@repo/contracts/pb/broadcasting/v1/player_pb";
 import { createValidator } from "@bufbuild/protovalidate";
 import { getGridRoom } from "@repo/core/geo-coordinates";
 import { createRedisTransmitter } from "@repo/redis-adapter/transmitter";

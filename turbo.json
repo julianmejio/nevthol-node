@@ -9,14 +9,14 @@
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "generate": {
-      "cache": true,
+      "cache": false,
       "dependsOn": ["^generate"]
     },
     "lint": {
       "dependsOn": ["^lint"]
     },
     "check-types": {
-      "dependsOn": ["^check-types", "^generate"]
+      "dependsOn": ["^check-types", "^generate", "^build"]
     },
     "dev": {
       "cache": false,

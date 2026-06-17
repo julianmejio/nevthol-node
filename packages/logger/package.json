@@ -5,13 +5,14 @@
   "description": "",
   "exports": {
     ".": {
-      "import": "./src/logger.ts",
-      "default": "./src/logger.ts"
+      "types": "./dist/logger.d.ts",
+      "import": "./dist/logger.js"
     }
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "lint": "eslint --max-warnings 0"
+    "lint": "eslint --max-warnings 0",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",

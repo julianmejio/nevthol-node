@@ -3,7 +3,7 @@ import uWS, {
   type us_listen_socket,
   type WebSocket,
 } from "uWebSockets.js";
-import { PlayerPositionSchema } from "@repo/contracts/pb/player_position/v1/player_position_pb.js";
+import { PlayerPositionSchema } from "@repo/contracts/pb/broadcasting/v1/player_pb";
 import { fromBinary } from "@bufbuild/protobuf";
 import { createValidator } from "@bufbuild/protovalidate";
 import type { IMessagePublisher } from "@repo/messaging/message-broker";
@@ -156,17 +156,24 @@ export const createServer = ({
       }
     },
     close: async (ws: WebSocket<WebSocketUserData>, code, message) => {
-      const decoder = new TextDecoder("utf-8");
-      const { connectionId } = ws.getUserData();
-      const currentCharacter = await store.getCurrentCharacter(connectionId);
-      await tracker.removeCharacterPosition(currentCharacter as string);
-      await userStore.deleteUser(currentCharacter as string);
-      await store.delete(connectionId);
-      console.log(
-        `Client disconnected (${code}).`,
-        connectionId,
-        decoder.decode(message),
-      );
+      try {
+        const decoder = new TextDecoder("utf-8");
+        const { connectionId } = ws.getUserData();
+        const currentCharacter = await store.getCurrentCharacter(connectionId);
+        if (null != currentCharacter) {
+          await tracker.removeCharacterPosition(currentCharacter as string);
+          await userStore.deleteUser(currentCharacter as string);
+        }
+        await store.delete(connectionId);
+        console.log(
+          `Client disconnected (${code}).`,
+          connectionId,
+          decoder.decode(message),
+        );
+      } catch (error) {
+        console.error("Error closing a connection", error);
+        return;
+      }
     },
   });
   return new Promise((resolve) => {

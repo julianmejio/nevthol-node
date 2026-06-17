@@ -6,12 +6,13 @@
   "private": true,
   "scripts": {
     "check-types": "tsc --noEmit",
-    "lint": "eslint --max-warnings 0"
+    "lint": "eslint --max-warnings 0",
+    "build": "tsc"
   },
   "exports": {
     "./authentication-service": {
-      "import": "./src/authenticationService.ts",
-      "default": "./src/authenticationService.ts"
+      "types": "./src/authenticationService.d.ts",
+      "import": "./src/authenticationService.js"
     }
   },
   "keywords": [],

@@ -5,12 +5,12 @@
   "private": true,
   "exports": {
     "./connection": {
-      "import": "./src/connection.ts",
-      "default": "./src/connection.ts"
+      "types": "./dist/connection.d.ts",
+      "import": "./dist/connection.js"
     },
     "./user": {
-      "import": "./src/user.ts",
-      "default": "./src/user.ts"
+      "types": "./dist/user.d.ts",
+      "import": "./dist/user.js"
     }
   },
   "keywords": [],
@@ -18,7 +18,8 @@
   "license": "ISC",
   "scripts": {
     "check-types": "tsc --noEmit",
-    "lint": "eslint --max-warnings 0"
+    "lint": "eslint --max-warnings 0",
+    "build": "tsc"
   },
   "dependencies": {
     "@repo/contracts": "workspace:*"

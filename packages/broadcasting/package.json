@@ -5,12 +5,13 @@
   "private": true,
   "scripts": {
     "check-types": "tsc --noEmit",
-    "lint": "eslint --max-warnings 0"
+    "lint": "eslint --max-warnings 0",
+    "build": "tsc"
   },
   "exports": {
     "./geo-broadcast": {
-      "import": "./src/geo-broadcast.ts",
-      "default": "./src/geo-broadcast.ts"
+      "types": "./dist/geo-broadcast.d.ts",
+      "import": "./dist/geo-broadcast.js"
     }
   },
   "keywords": [],

@@ -1,0 +1,26 @@
+services:
+  kafka-ui:
+    image: ghcr.io/kafbat/kafka-ui
+    ports:
+      - "${KAFKA_UI_PORT:-8081}:8081"
+    environment:
+      DYNAMIC_CONFIG_ENABLED: "true"
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    depends_on:
+      - kafka
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redis-ui
+    environment:
+      RI_APP_PORT: "${REDIS_UI_PORT:-8082}"
+    ports:
+      - "${REDIS_UI_PORT:-8082}:8082"
+    volumes:
+      - redisinsight-data:/data
+    depends_on:
+      - redis
+
+volumes:
+  redisinsight-data:

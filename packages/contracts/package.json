@@ -6,35 +6,35 @@
   "type": "module",
   "exports": {
     "./pb/*": {
-      "import": "./src/generated/pb/*",
-      "default": "./src/generated/pb/*"
+      "types": "./dist/generated/pb/*.d.ts",
+      "import": "./dist/generated/pb/*.js"
     },
     "./player": {
-      "import": "./src/player.ts",
-      "default": "./src/player.ts"
+      "types": "./dist/player.d.ts",
+      "import": "./dist/player.js"
     },
     "./error": {
-      "import": "./src/error.ts",
-      "default": "./src/error.ts"
+      "types": "./dist/error.d.ts",
+      "import": "./dist/error.js"
     },
     "./gw2/v2": {
-      "import": "./src/gw2/v2/index.ts",
-      "default": "./src/gw2/v2/index.ts"
+      "types": "./dist/gw2/v2/index.d.ts",
+      "import": "./dist/gw2/v2/index.js"
     },
     "./api-gateway/authentication": {
-      "import": "./src/api-gateway/authentication.ts",
-      "default": "./src/api-gateway/authentication.ts"
+      "types": "./dist/api-gateway/authentication.d.ts",
+      "import": "./dist/api-gateway/authentication.js"
     },
     "./api-gateway/response-common": {
-      "import": "./src/api-gateway/response-common.ts",
-      "default": "./src/api-gateway/response-common.ts"
+      "types": "./dist/api-gateway/response-common.d.ts",
+      "import": "./dist/api-gateway/response-common.js"
     }
   },
   "scripts": {
     "generate": "buf generate",
     "lint": "buf lint && eslint --max-warnings 0",
     "check-types": "tsc --noEmit",
-    "build": "buf build"
+    "build": "buf build && tsc"
   },
   "keywords": [],
   "author": "",

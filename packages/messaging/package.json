@@ -6,13 +6,14 @@
   "type": "module",
   "exports": {
     "./message-broker": {
-      "import": "./src/message-broker.ts",
-      "default": "./src/message-broker.ts"
+      "types": "./dist/message-broker.d.ts",
+      "import": "./dist/message-broker.js"
     }
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "lint": "eslint --max-warnings 0"
+    "lint": "eslint --max-warnings 0",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",

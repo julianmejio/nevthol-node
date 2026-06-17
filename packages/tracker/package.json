@@ -5,13 +5,14 @@
   "private": true,
   "exports": {
     "./trail": {
-      "import": "./src/trail.ts",
-      "default": "./src/trail.ts"
+      "types": "./dist/trail.d.ts",
+      "import": "./dist/trail.js"
     }
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "lint": "eslint --max-warnings 0"
+    "lint": "eslint --max-warnings 0",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",

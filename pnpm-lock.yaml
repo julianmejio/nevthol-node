@@ -29,6 +29,9 @@ importers:
       '@repo/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@repo/game-api':
+        specifier: workspace:*
+        version: link:../../packages/game-api
       '@repo/gw2api-adapter':
         specifier: workspace:*
         version: link:../../packages/gw2api-adapter
@@ -57,9 +60,6 @@ importers:
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
-      '@repo/game-api':
-        specifier: workspace:*
-        version: link:../../packages/game-api
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config

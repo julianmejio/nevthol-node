@@ -5,13 +5,14 @@
   "description": "",
   "exports": {
     "./account": {
-      "import": "./src/account.ts",
-      "default": "./src/account.ts"
+      "types": "./dist/account.d.ts",
+      "import": "./dist/account.js"
     }
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "lint": "eslint --max-warnings 0"
+    "lint": "eslint --max-warnings 0",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
