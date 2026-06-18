@@ -10,12 +10,12 @@ services:
     ports:
       - "${API_PORT:-3002}:3002"
 
-  geo-transponder:
+  ground-station:
     build:
       context: .
-      dockerfile: ./apps/geo-transponder/Dockerfile
+      dockerfile: ./apps/ground-station/Dockerfile
       target: runner
     ports:
-      - "${TRANSPONDER_PORT:-9001}:9001"
+      - "${GROUND_STATION_PORT:-9001}:9001"
     depends_on:
       - kafka
