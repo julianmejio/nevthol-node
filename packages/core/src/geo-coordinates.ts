@@ -79,17 +79,19 @@ const unpackCoordinates = (buffer: Buffer): { x: number; y: number } => {
   };
 };
 
-/**
- * Represents a point, associated with a grid size for grid calculations.
- */
-interface GridPoint {
+interface MapCoordinate {
   /** X coordinate. */
   x: number;
   /** Y coordinate */
   y: number;
+}
+/**
+ * Represents a point, associated with a grid size for grid calculations.
+ */
+type GridPoint = MapCoordinate & {
   /** Grid size where the point must be located */
   gridSize?: number;
-}
+};
 
 /**
  * Radius where the viewport should be located
@@ -174,13 +176,38 @@ const getNearestRooms = ({
   return subscriptions;
 };
 
+/**
+ * Calculates the speed and direction (angle) in degrees.
+ * @param {MapCoordinate} p1 Starting point.
+ * @param {MapCoordinate} p2 Ending point.
+ * @param {number} timeSpan Time in milliseconds, elapsed from p1 to p2.
+ * @return {number, number} The resulting speed and direction.
+ */
+const calculateVelocity = (
+  p1: MapCoordinate,
+  p2: MapCoordinate,
+  timeSpan: number,
+): { speed: number; direction: number } => {
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+  const speed = distance / (timeSpan / 1000);
+  const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+  return {
+    speed,
+    direction: angle < 0 ? angle + 360 : angle,
+  };
+};
+
 export {
   tyriaToLatLng,
   latLngToTyria,
   packCoordinates,
   unpackCoordinates,
+  type MapCoordinate,
   type GridPoint,
   type ViewportRadiusCoordinates,
   getGridRoom,
   getNearestRooms,
+  calculateVelocity,
 };

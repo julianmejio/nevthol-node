@@ -20,7 +20,8 @@
   "scripts": {
     "check-types": "tsc --noEmit",
     "lint": "eslint --max-warnings 0",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "vitest run ."
   },
   "keywords": [],
   "author": "",
@@ -33,6 +34,7 @@
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^25.9.3",
     "eslint": "catalog:",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
   }
 }
