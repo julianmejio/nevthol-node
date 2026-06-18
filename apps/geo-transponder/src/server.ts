@@ -25,7 +25,7 @@ const connectionsServed = new Map<string, WebSocket<WebSocketUserData>>();
 export interface ServerInstance {
   app: TemplatedApp;
   token: us_listen_socket;
-  closeAllConnections: () => Promise<void>;
+  shutdown: () => Promise<void>;
 }
 
 export interface ServerParams {
@@ -53,7 +53,7 @@ export const createServer = ({
   maxBufferedAmountPerConnection = MAX_BUFFERED_AMOUNT_PER_CONNECTION,
   topicName,
 }: ServerParams): Promise<ServerInstance> => {
-  const closeAllConnections = async () => {
+  const shutdown = async () => {
     try {
       const closePromises = Array.from(connectionsServed.keys()).map(
         async (key: string) => {
@@ -71,6 +71,7 @@ export const createServer = ({
         },
       );
       await Promise.all(closePromises);
+      app.close();
     } catch (error) {
       console.error(
         "Error occurred when tried to delete all the connections from the store",
@@ -207,7 +208,7 @@ export const createServer = ({
   });
   return new Promise((resolve) => {
     app.listen(listeningPort, (token) => {
-      resolve({ app, token, closeAllConnections });
+      resolve({ app, token, shutdown });
     });
   });
 };
