@@ -20,10 +20,12 @@ import type { ITrailTracker } from "@repo/tracker/trail";
 import type { IUserStore } from "@repo/session/user";
 
 const validator = createValidator();
+const connectionsServed = new Map<string, WebSocket<WebSocketUserData>>();
 
 export interface ServerInstance {
   app: TemplatedApp;
   token: us_listen_socket;
+  closeAllConnections: () => Promise<void>;
 }
 
 export interface ServerParams {
@@ -51,6 +53,31 @@ export const createServer = ({
   maxBufferedAmountPerConnection = MAX_BUFFERED_AMOUNT_PER_CONNECTION,
   topicName,
 }: ServerParams): Promise<ServerInstance> => {
+  const closeAllConnections = async () => {
+    try {
+      const closePromises = Array.from(connectionsServed.keys()).map(
+        async (key: string) => {
+          const ws = connectionsServed.get(key);
+          ws?.close();
+          const currentCharacter = await store.getCurrentCharacter(key);
+          await store.expire(key, 3600);
+          if (null !== currentCharacter) {
+            await Promise.all([
+              tracker.removeCharacterPosition(currentCharacter as string),
+              userStore.keepAlive(currentCharacter as string, 3600),
+            ]);
+          }
+          connectionsServed.delete(key);
+        },
+      );
+      await Promise.all(closePromises);
+    } catch (error) {
+      console.error(
+        "Error occurred when tried to delete all the connections from the store",
+        error,
+      );
+    }
+  };
   const app = uWS.App().ws<WebSocketUserData>("/*", {
     compression: uWS.DISABLED,
     maxPayloadLength: maxPayloadLength,
@@ -109,6 +136,7 @@ export const createServer = ({
     },
     open: (ws: WebSocket<WebSocketUserData>) => {
       const { connectionId } = ws.getUserData();
+      connectionsServed.set(connectionId, ws);
       console.log("Client connected", connectionId);
     },
     message: (ws: WebSocket<WebSocketUserData>, message, isBinary) => {
@@ -162,14 +190,15 @@ export const createServer = ({
         const currentCharacter = await store.getCurrentCharacter(connectionId);
         if (null != currentCharacter) {
           await tracker.removeCharacterPosition(currentCharacter as string);
-          await userStore.deleteUser(currentCharacter as string);
+          await userStore.keepAlive(currentCharacter as string, 3600);
         }
-        await store.delete(connectionId);
+        await store.expire(connectionId, 3600);
         console.log(
           `Client disconnected (${code}).`,
           connectionId,
           decoder.decode(message),
         );
+        connectionsServed.delete(connectionId);
       } catch (error) {
         console.error("Error closing a connection", error);
         return;
@@ -178,7 +207,7 @@ export const createServer = ({
   });
   return new Promise((resolve) => {
     app.listen(listeningPort, (token) => {
-      resolve({ app, token });
+      resolve({ app, token, closeAllConnections });
     });
   });
 };

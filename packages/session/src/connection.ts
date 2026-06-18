@@ -22,6 +22,7 @@ interface IConnectionStore {
     authenticationLevel: AuthenticationLevelEnum,
   ) => Promise<void>;
   delete: (connectionId: string) => Promise<void>;
+  deleteMultiple: (connectionIds: string[]) => Promise<void>;
 }
 
 export { type IConnectionStore };

@@ -46,7 +46,7 @@ const bootstrap = async (): Promise<void> => {
     await store.connect();
     await tracker.connect();
     await userStore.connect();
-    const { token } = await createServer({
+    const { token, closeAllConnections } = await createServer({
       messenger,
       store,
       tracker,
@@ -59,7 +59,7 @@ const bootstrap = async (): Promise<void> => {
     process.on("SIGINT", async () => {
       console.log("Closing GEO transponder...");
       us_listen_socket_close(token);
-      await messenger.disconnect();
+      await closeAllConnections();
       process.exit(0);
     });
   } catch (error) {

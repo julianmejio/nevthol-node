@@ -24,6 +24,7 @@ interface IHashKeyValueStore {
   expireKey: (key: string, ttl: number) => Promise<void>;
   expireField: (key: string, field: string, ttl: number) => Promise<void>;
   deleteKey: (key: string) => Promise<void>;
+  deleteKeys: (keys: string[]) => Promise<void>;
 }
 
 const createKeyValueStore = (
@@ -57,12 +58,16 @@ const createKeyValueStore = (
       await client.hSet(key, field, value);
       if (ttl) {
         await client.hExpire(key, field, ttl);
+      } else {
+        await client.hPersist(key, field);
       }
     },
     setMultiple: async (key: string, data: IStorableObject, ttl?: number) => {
       await client.hSet(key, data);
       if (ttl) {
         await client.expire(key, ttl);
+      } else {
+        await client.persist(key);
       }
     },
     persistKey: async (key: string) => {
@@ -82,6 +87,12 @@ const createKeyValueStore = (
     },
     deleteKey: async (key: string) => {
       await client.del(key);
+    },
+    deleteKeys: async (keys: string[]) => {
+      if (keys.length <= 0) {
+        return;
+      }
+      await client.unlink(keys);
     },
   };
 };

@@ -106,7 +106,7 @@ await consumer.subscribe({
       }
       playerConnections.set(key, characterName);
       await connectionStore.setCurrentCharacter(key, characterName);
-      await userStore.deleteUser(String(playerName));
+      await userStore.keepAlive(String(playerName), 86400);
       await tracker.removeCharacterPosition(String(playerName));
       console.debug(`${characterName} is now broadcasting on channel ${key}`);
     }

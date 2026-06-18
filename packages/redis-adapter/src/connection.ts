@@ -71,6 +71,14 @@ const createConnectionStore = (
     delete: async (connectionId: string) => {
       await client.deleteKey(getSessionHash(connectionId));
     },
+    deleteMultiple: async (connectionIds: string[]) => {
+      if (connectionIds.length <= 0) {
+        return;
+      }
+      await client.deleteKeys(
+        connectionIds.map((connectionId) => getSessionHash(connectionId)),
+      );
+    },
     increasePositionCount: async (connectionId: string) => {
       return await client.incr(
         getSessionHash(connectionId),

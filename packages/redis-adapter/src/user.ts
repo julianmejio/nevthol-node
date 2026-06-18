@@ -20,18 +20,13 @@ const createUserStore = (
       attribute: keyof typeof UserAttributes,
       value: T,
     ) => {
-      await keyValueStore.set<T>(
-        getUserHash(characterName),
-        attribute,
-        value,
-        300,
-      );
+      await keyValueStore.set<T>(getUserHash(characterName), attribute, value);
     },
     setAttributes: async (
       characterName: string,
       data: Partial<UserAttributeCollection>,
     ) => {
-      await keyValueStore.setMultiple(getUserHash(characterName), data, 300);
+      await keyValueStore.setMultiple(getUserHash(characterName), data);
     },
     getAttribute: async <T extends string | number>(
       characterName: string,
