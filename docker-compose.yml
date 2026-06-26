@@ -15,6 +15,9 @@ services:
       context: .
       dockerfile: ./apps/ground-station/Dockerfile
       target: runner
+    env_file:
+      - path: ./apps/ground-station/.env
+        required: false
     ports:
       - "${GROUND_STATION_PORT:-9001}:9001"
     depends_on:

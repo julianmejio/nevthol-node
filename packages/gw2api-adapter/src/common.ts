@@ -13,6 +13,7 @@ const apiBaseUrl = "https://api.guildwars2.com/v2";
 const Endpoint = {
   TokenInfo: "/tokeninfo",
   Characters: "/characters",
+  Account: "/account",
 } as const;
 
 const TokenInfoParameterSchema = z.object({
@@ -25,9 +26,15 @@ const CharactersParametersSchema = z.object({
   parameters: z.null().default(null),
 });
 
+const AccountParametersSchema = z.object({
+  endpoint: z.literal(Endpoint.Account),
+  parameters: z.null().default(null),
+});
+
 export const EndpointParametersSchema = z.discriminatedUnion("endpoint", [
   TokenInfoParameterSchema,
   CharactersParametersSchema,
+  AccountParametersSchema,
 ]);
 
 type EndpointParameters = z.infer<typeof EndpointParametersSchema>;

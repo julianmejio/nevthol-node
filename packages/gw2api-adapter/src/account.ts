@@ -1,6 +1,6 @@
 import type { IAccountClient } from "@repo/game-api/account";
 import { Endpoint, fetchApi } from "./common.js";
-import { type Gw2ApiTokenInfo } from "@repo/contracts/gw2/v2";
+import { type Account, type Gw2ApiTokenInfo } from "@repo/contracts/gw2/v2";
 import { AppErrorCode } from "@repo/contracts/error";
 
 export const createAccountClient = (): IAccountClient => {
@@ -22,6 +22,15 @@ export const createAccountClient = (): IAccountClient => {
       return await fetchApi<string[]>({
         endpointConfiguration: {
           endpoint: Endpoint.Characters,
+          parameters: null,
+        },
+        authorizationToken: gw2Token as string,
+      });
+    },
+    getAccountInfo: async () => {
+      return await fetchApi<Account>({
+        endpointConfiguration: {
+          endpoint: Endpoint.Account,
           parameters: null,
         },
         authorizationToken: gw2Token as string,

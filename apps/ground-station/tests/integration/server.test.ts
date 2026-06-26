@@ -9,12 +9,12 @@ import {
 } from "vitest";
 import { type us_listen_socket, us_listen_socket_close } from "uWebSockets.js";
 import { createServer } from "../../src/server";
-import { PlayerPositionSchema } from "@repo/contracts/pb/player_position/v1/player_position_pb.js";
+import { PlayerPositionSchema } from "@repo/contracts/pb/broadcasting/v1/player_pb";
 import { create, toBinary } from "@bufbuild/protobuf";
 import { Violation } from "@bufbuild/protovalidate";
-import { type IMessagePublisher } from "@repo/messaging/message-broker.js";
+import { type IMessagePublisher } from "@repo/messaging/message-broker";
 import { createKafkaPublisher } from "@repo/kafka-adapter/node-rdkafka";
-import { type IInitializable } from "@repo/core/lifecycle.js";
+import { type IInitializable } from "@repo/core/lifecycle";
 
 describe("GEO transponder", () => {
   let serverToken: us_listen_socket | null = null;

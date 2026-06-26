@@ -1,5 +1,6 @@
 ARG NODE_VERSION=24.16.0
-FROM node:${NODE_VERSION}-slim AS base
+ARG NODE_VARIANT=trixie-slim
+FROM node:${NODE_VERSION}-${NODE_VARIANT} AS base
 
 FROM base AS setup
 
@@ -12,7 +13,7 @@ RUN pnpm add turbo --global
 # Copy monorepo contents
 COPY . .
 # And choice the geo-transponder
-RUN turbo prune geo-transponder --docker
+RUN turbo prune ground-station --docker
 
 FROM base AS builder
 
@@ -31,14 +32,14 @@ COPY --from=setup /app/out/full/ .
 # And build
 RUN pnpm build
 
-FROM node:${NODE_VERSION}-slim AS runner
+FROM node:${NODE_VERSION}-${NODE_VARIANT} AS runner
 
 WORKDIR /app
 # Do not run as root
-RUN addgroup --system --gid 1001 transponder
-RUN adduser --system --uid 1001 transponder
-USER transponder
+RUN addgroup --system --gid 1001 groundstation
+RUN adduser --system --uid 1001 groundstation
+USER groundstation
 # Copy from previous step
 COPY --from=builder /app .
 # And run :)
-CMD ["node", "apps/geo-transponder/dist/index.js"]
+CMD ["node", "apps/ground-station/dist/index.js"]

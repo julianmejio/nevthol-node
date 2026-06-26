@@ -25,6 +25,10 @@
       "types": "./dist/api-gateway/authentication.d.ts",
       "import": "./dist/api-gateway/authentication.js"
     },
+    "./api-gateway/elevation": {
+      "types": "./dist/api-gateway/elevation.d.ts",
+      "import": "./dist/api-gateway/elevation.js"
+    },
     "./api-gateway/response-common": {
       "types": "./dist/api-gateway/response-common.d.ts",
       "import": "./dist/api-gateway/response-common.js"

@@ -1,5 +1,5 @@
 {
-  "name": "@repo/authentication",
+  "name": "@repo/authentication-store",
   "version": "1.0.0",
   "description": "",
   "type": "module",
@@ -11,29 +11,23 @@
     "test": "vitest run ."
   },
   "exports": {
-    "./authentication-service": {
-      "types": "./src/authenticationService.d.ts",
-      "import": "./dist/authenticationService.js"
+    "./elevation-store": {
+      "types": "./src/elevation-store.d.ts",
+      "import": "./dist/elevation-store.js"
     }
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@repo/contracts": "workspace:*",
-    "@repo/authentication-store": "workspace:*",
-    "@repo/gw2api-adapter": "workspace:*",
-    "jsonwebtoken": "^9.0.3",
-    "nanoid": "^5.1.11"
+    "@repo/contracts": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
-    "@repo/game-api": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/vitest-config": "workspace:*",
     "@tsconfig/node-ts": "^23.6.4",
     "@tsconfig/node24": "^24.0.4",
-    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.9.3",
     "eslint": "catalog:",
     "typescript": "^6.0.3",

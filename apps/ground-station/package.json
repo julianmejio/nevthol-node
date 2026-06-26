@@ -26,6 +26,7 @@
     "@types/node": "^25.9.3",
     "esbuild": "^0.28.1",
     "eslint": "catalog:",
+    "kafkajs": "^2.2.4",
     "testcontainers": "^12.0.2",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8"
@@ -40,8 +41,6 @@
     "@repo/tracker": "workspace:*",
     "@repo/vitest-config": "workspace:*",
     "jsonwebtoken": "^9.0.3",
-    "kafkajs": "^2.2.4",
-    "node-rdkafka": "^3.6.1",
     "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.67.0",
     "ws": "^8.21.0",
     "zod": "^4.4.3"

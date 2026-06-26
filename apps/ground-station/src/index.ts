@@ -67,5 +67,9 @@ const bootstrap = async (): Promise<void> => {
     process.exit(1);
   }
 };
-
-await bootstrap();
+try {
+  await bootstrap();
+} catch (err) {
+  console.error("Could not initiate the ground station", err);
+  process.exit(1);
+}

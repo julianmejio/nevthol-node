@@ -4,7 +4,7 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": ["^build", "^generate"],
+      "dependsOn": ["^build", "generate"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
@@ -24,7 +24,7 @@
       "dependsOn": ["^build"]
     },
     "test": {
-      "dependsOn": ["^test"],
+      "dependsOn": ["^test", "^build"],
       "env": ["KAFKA_BROKERS"]
     }
   }
