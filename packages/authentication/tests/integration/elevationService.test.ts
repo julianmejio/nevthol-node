@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createElevationService } from "../../src/elevationService";
-import { createMockAccountApi, createMockStore } from "../mocks";
+import { createElevationService } from "../../src/elevationService.ts";
+import { createMockAccountApi, createMockStore } from "../mocks.ts";
 
 describe("Elevation service", () => {
   const accountApi = createMockAccountApi();
