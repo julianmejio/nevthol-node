@@ -5,7 +5,7 @@ import { z } from "zod";
 /**
  * Schema with a list of possible GW2 API permissions.
  */
-export const Gw2ApiScopesSchema = z.enum([
+export const ScopesSchema = z.enum([
   "account",
   "builds",
   "characters",
@@ -21,15 +21,14 @@ export const Gw2ApiScopesSchema = z.enum([
 /**
  * List of possible GW2 API permissions.
  */
-export type Gw2ApiScopes = z.infer<typeof Gw2ApiScopesSchema>;
+export type Scopes = z.infer<typeof ScopesSchema>;
 
 /**
  * Schema for validating [/tokeninfo]{@link https://wiki-en.guildwars2.com/wiki/API:2/tokeninfo} responses.
  * @see GW2 [/createsubtoken]{@link https://wiki.guildwars2.com/wiki/API:2/createsubtoken}
  * @see GW2 [API key]{@link https://wiki.guildwars2.com/wiki/API:API_key}
- * @todo Move it to contracts package.
  */
-export const Gw2ApiTokenInfoSchema = z.object({
+export const TokenInfoSchema = z.object({
   /** The first half of the API key that was requested. */
   id: z
     .string({ error: "Token ID is not present" })
@@ -47,7 +46,7 @@ export const Gw2ApiTokenInfoSchema = z.object({
    * Array describing which permissions the API key has.
    */
   permissions: z
-    .array(Gw2ApiScopesSchema)
+    .array(ScopesSchema)
     .describe("Array of strings describing which permissions the API key has"),
 });
 
@@ -56,4 +55,4 @@ export const Gw2ApiTokenInfoSchema = z.object({
  * @see GW2 [/createsubtoken]{@link https://wiki.guildwars2.com/wiki/API:2/createsubtoken}
  * @see GW2 [API key]{@link https://wiki.guildwars2.com/wiki/API:API_key}
  */
-export type Gw2ApiTokenInfo = z.infer<typeof Gw2ApiTokenInfoSchema>;
+export type TokenInfo = z.infer<typeof TokenInfoSchema>;

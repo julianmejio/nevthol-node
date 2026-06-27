@@ -12,7 +12,7 @@
   },
   "exports": {
     "./elevation-store": {
-      "types": "./src/elevation-store.d.ts",
+      "types": "./dist/elevation-store.d.ts",
       "import": "./dist/elevation-store.js"
     }
   },
@@ -20,7 +20,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@repo/contracts": "workspace:*"
+    "@repo/contracts": "workspace:*",
+    "effect": "^3.21.4"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

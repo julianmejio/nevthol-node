@@ -18,7 +18,7 @@ import { z } from "zod";
 /**
  * X
  */
-const PostElevationRequestSchema = z.object({
+export const PostElevationRequestSchema = z.object({
   token: z
     .union([
       z
@@ -31,69 +31,54 @@ const PostElevationRequestSchema = z.object({
     ])
     .describe("Guild Wars 2 token or subtoken"),
 });
-type PostElevationRequest = z.infer<typeof PostElevationRequestSchema>;
+export type PostElevationRequest = z.infer<typeof PostElevationRequestSchema>;
 
-const PostElevationResponseSchema = z.object({
+export const PostElevationResponseSchema = z.object({
   challengeJwt: z.jwt(),
 });
-type PostElevationResponse = z.infer<typeof PostElevationResponseSchema>;
+export type PostElevationResponse = z.infer<typeof PostElevationResponseSchema>;
 
-const PostChallengeResponseRequestSchema = PostElevationResponseSchema.extend({
-  response: z.object({
-    token: z
-      .union([
-        z
-          .jwt({ error: "JWT Token is malformed" })
-          .describe("Guild Wars 2 subtoken"),
-        z
-          .string({ error: "Token is malformed" })
-          .regex(/^([0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}){2}$/i)
-          .describe("Guild Wars 2 token"),
-      ])
-      .describe("Guild Wars 2 token or subtoken"),
-  }),
-});
-type PostChallengeResponseRequest = z.infer<
+export const PostChallengeResponseRequestSchema =
+  PostElevationResponseSchema.extend({
+    response: z.object({
+      token: z
+        .union([
+          z
+            .jwt({ error: "JWT Token is malformed" })
+            .describe("Guild Wars 2 subtoken"),
+          z
+            .string({ error: "Token is malformed" })
+            .regex(/^([0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}){2}$/i)
+            .describe("Guild Wars 2 token"),
+        ])
+        .describe("Guild Wars 2 token or subtoken"),
+    }),
+  });
+export type PostChallengeResponseRequest = z.infer<
   typeof PostChallengeResponseRequestSchema
 >;
 
-const PostChallengeResponseResponseSchema = z.object({
+export const PostChallengeResponseResponseSchema = z.object({
   elevationToken: z.base64(),
 });
-type PostChallengeResponseResponse = z.infer<
+export type PostChallengeResponseResponse = z.infer<
   typeof PostChallengeResponseResponseSchema
 >;
-const ChallengeMetadataSchema = z.object({
+export const ChallengeMetadataSchema = z.object({
   id: z.string(),
   accountId: z.guid(),
   tokenId: z.guid(),
   test: z.string(),
 });
-type ChallengeMetadata = z.infer<typeof ChallengeMetadataSchema>;
-const ChallengePuzzleSchema = ChallengeMetadataSchema.pick({
+export type ChallengeMetadata = z.infer<typeof ChallengeMetadataSchema>;
+export const ChallengePuzzleSchema = ChallengeMetadataSchema.pick({
   id: true,
   test: true,
 });
-type ChallengePuzzle = z.infer<typeof ChallengePuzzleSchema>;
-const ChallengeSolutionSchema = ChallengeMetadataSchema.pick({
+export type ChallengePuzzle = z.infer<typeof ChallengePuzzleSchema>;
+export const ChallengeSolutionSchema = ChallengeMetadataSchema.pick({
   id: true,
 }).extend({
   solution: z.jwt(),
 });
-type ChallengeSolution = z.infer<typeof ChallengeSolutionSchema>;
-export {
-  type PostElevationRequest,
-  type PostElevationResponse,
-  type PostChallengeResponseRequest,
-  type PostChallengeResponseResponse,
-  type ChallengeMetadata,
-  type ChallengePuzzle,
-  type ChallengeSolution,
-  PostElevationRequestSchema,
-  PostElevationResponseSchema,
-  PostChallengeResponseRequestSchema,
-  PostChallengeResponseResponseSchema,
-  ChallengeMetadataSchema,
-  ChallengePuzzleSchema,
-  ChallengeSolutionSchema,
-};
+export type ChallengeSolution = z.infer<typeof ChallengeSolutionSchema>;

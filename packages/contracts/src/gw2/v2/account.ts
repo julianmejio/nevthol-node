@@ -1,8 +1,9 @@
 import { z } from "zod";
 
-const AccountSchema = z.object({
+export const AccountSchema = z.object({
   id: z.guid(),
 });
-type Account = z.infer<typeof AccountSchema>;
+export type Account = z.infer<typeof AccountSchema>;
 
-export { AccountSchema, type Account };
+export const CharacterListSchema = z.array(z.string());
+export type CharacterList = z.infer<typeof CharacterListSchema>;

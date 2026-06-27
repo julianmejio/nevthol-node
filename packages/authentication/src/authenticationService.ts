@@ -7,7 +7,7 @@ import {
   type PostAuthenticateResponse,
 } from "@repo/contracts/api-gateway/authentication";
 import { AppErrorCode } from "@repo/contracts/error";
-import { Gw2ApiTokenInfoSchema } from "@repo/contracts/gw2/v2";
+import { TokenInfoSchema } from "@repo/contracts/gw2/v2";
 import jwt, { type SignOptions } from "jsonwebtoken";
 import { nanoid } from "nanoid";
 
@@ -33,7 +33,7 @@ const createAuthenticationService = (
     try {
       accountClient.authenticate(gw2Token);
       const tokenInformation = await accountClient.getTokenInfo();
-      const result = Gw2ApiTokenInfoSchema.safeParse(tokenInformation);
+      const result = TokenInfoSchema.safeParse(tokenInformation);
       return result.success;
     } catch {
       return false;

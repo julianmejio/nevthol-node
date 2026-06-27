@@ -1,137 +1,189 @@
 import { timingSafeEqual } from "node:crypto";
-import type { IAccountClient } from "@repo/game-api/account";
+import { AccountApi } from "@repo/game-api/account";
 import { nanoid } from "nanoid";
-import type { Account, Gw2ApiTokenInfo } from "@repo/contracts/gw2/v2";
 import type {
   ChallengePuzzle,
   ChallengeSolution,
   ChallengeMetadata,
 } from "@repo/contracts/api-gateway/elevation";
-import type { ElevationStore } from "@repo/authentication-store/elevation-store";
+import { ElevationStore } from "@repo/authentication-store/elevation-store";
+import { Effect, Context, Layer } from "effect";
+import { type AppError, AppErrorCode } from "@repo/contracts/error";
 
-interface ElevationService {
-  challenge: (
-    token: string,
-    expirationSeconds: number,
-  ) => Promise<ChallengePuzzle>;
-  solve: (solution: ChallengeSolution) => Promise<string | false>;
+const DIGEST = "SHA-256";
+const TEST_API_KEY_NAME_PREFIX = "gwradar.com_verify_account_";
+
+const calculateHkdf = async (
+  ikm: Buffer,
+  digest: string,
+  accountGuid: string,
+) => {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new Uint8Array(ikm),
+    "HKDF",
+    false,
+    ["deriveKey"],
+  );
+  return await crypto.subtle.deriveKey(
+    {
+      name: "HKDF",
+      hash: digest,
+      salt: encoder.encode(accountGuid),
+      info: encoder.encode("elevated-authentication"),
+    },
+    key,
+    { name: "HMAC", hash: digest, length: 256 },
+    false,
+    ["sign"],
+  );
+};
+
+export interface ElevationServiceConfig {
+  readonly ikm: Buffer;
 }
+export const ElevationServiceConfig =
+  Context.GenericTag<ElevationServiceConfig>("ElevationServiceConfig");
 
-interface ElevationServiceParams {
-  accountApi: IAccountClient;
-  store: ElevationStore;
-  privateKey: string;
-  publicKey: string;
-  ikm: Buffer;
-}
-
-const createElevationService = (
-  params: ElevationServiceParams,
-): ElevationService => {
-  const digest = "SHA-256";
-  const apiKeyNamePrefix = "gwradar.com_verify_account_";
-  const calculateHkdf = async (accountGuid: string) => {
-    const encoder = new TextEncoder();
-    const ikm = await crypto.subtle.importKey(
-      "raw",
-      new Uint8Array(params.ikm),
-      "HKDF",
-      false,
-      ["deriveKey"],
-    );
-    return await crypto.subtle.deriveKey(
-      {
-        name: "HKDF",
-        hash: digest,
-        salt: encoder.encode(accountGuid),
-        info: encoder.encode("elevated-authentication"),
-      },
-      ikm,
-      { name: "HMAC", hash: digest, length: 256 },
-      false,
-      ["sign"],
-    );
-  };
-  const challenge = async (
+export interface ElevationService {
+  readonly challenge: (
     token: string,
-    expirationSeconds: number = 300,
-  ): Promise<ChallengePuzzle> => {
-    const api = params.accountApi;
-    api.authenticate(token);
-    const [account, tokenInfo] = await Promise.all([
-      api.getAccountInfo() as Promise<Account>,
-      api.getTokenInfo() as Promise<Gw2ApiTokenInfo>,
-    ]);
-    const challenge: ChallengeMetadata = {
-      id: nanoid(),
-      accountId: account.id,
-      tokenId: tokenInfo.id,
-      test: `${apiKeyNamePrefix}${nanoid(8)}`,
-    };
-    await params.store.registerChallenge(challenge, expirationSeconds);
-    return {
-      id: challenge.id,
-      test: challenge.test,
-    };
-  };
-  const solve = async (solution: ChallengeSolution) => {
-    try {
-      const encoder = new TextEncoder();
-      const challenge = await params.store.consumeChallenge(solution.id);
-      const api = params.accountApi;
-      api.authenticate(solution.solution);
-      const [account, tokenInfo] = await Promise.all([
-        api.getAccountInfo() as Promise<Account>,
-        api.getTokenInfo() as Promise<Gw2ApiTokenInfo>,
-      ]);
-      const validations: [Buffer, Buffer][] = [
-        [
-          Buffer.from(
-            await crypto.subtle.digest(
-              digest,
-              encoder.encode(challenge.accountId),
+    expirationSeconds?: number,
+  ) => Effect.Effect<ChallengePuzzle, AppError, never>;
+  readonly solve: (
+    solution: ChallengeSolution,
+  ) => Effect.Effect<string, AppError, never>;
+}
+export const ElevationService =
+  Context.GenericTag<ElevationService>("ElevationService");
+
+export const ElevationServiceLive = Layer.effect(
+  ElevationService,
+  Effect.gen(function* () {
+    const api = yield* AccountApi;
+    const store = yield* ElevationStore;
+    const config = yield* ElevationServiceConfig;
+    return ElevationService.of({
+      challenge: (token: string, expirationSeconds = 300) =>
+        Effect.gen(function* () {
+          const [account, tokenInfo] = yield* Effect.all([
+            api.getAccount(token),
+            api.getTokenInfo(token),
+          ]);
+
+          const challengeMetadata: ChallengeMetadata = {
+            id: nanoid(),
+            accountId: account.id,
+            tokenId: tokenInfo.id,
+            test: `${TEST_API_KEY_NAME_PREFIX}${nanoid(8)}`,
+          };
+
+          yield* store.registerChallenge(challengeMetadata, expirationSeconds);
+
+          return {
+            id: challengeMetadata.id,
+            test: challengeMetadata.test,
+          };
+        }),
+      solve: (solution: ChallengeSolution) =>
+        Effect.gen(function* () {
+          const encoder = new TextEncoder();
+          const challengeMetadata = yield* store.consumeChallenge(solution.id);
+
+          const [account, tokenInfo] = yield* Effect.all(
+            [
+              api.getAccount(solution.solution),
+              api.getTokenInfo(solution.solution),
+            ],
+            { concurrency: "unbounded" },
+          );
+
+          const [
+            expectedAccountId,
+            actualAccountId,
+            expectedSolution,
+            actualSolution,
+          ] = yield* Effect.all([
+            Effect.tryPromise(() =>
+              crypto.subtle.digest(
+                DIGEST,
+                encoder.encode(challengeMetadata.accountId),
+              ),
             ),
-          ),
-          Buffer.from(
-            await crypto.subtle.digest(digest, encoder.encode(account.id)),
-          ),
-        ],
-        [
-          Buffer.from(
-            await crypto.subtle.digest(digest, encoder.encode(challenge.test)),
-          ),
-          Buffer.from(
-            await crypto.subtle.digest(digest, encoder.encode(tokenInfo.name)),
-          ),
-        ],
-      ];
-      const validated = validations.reduce(
-        (acc: boolean, cur: [Buffer, Buffer]) => {
-          const matches = timingSafeEqual(cur[0], cur[1]);
-          return acc && matches;
-        },
-        true,
-      );
-      if (!validated) {
-        return false;
-      }
-      const signingKey = await calculateHkdf(challenge.accountId);
-      return Buffer.from(
-        await crypto.subtle.sign(
-          "HMAC",
-          signingKey,
-          Buffer.from(challenge.tokenId),
-        ),
-      ).toString("base64");
-    } catch {
-      return false;
-    }
-  };
-  return { challenge, solve };
-};
-
-export {
-  type ElevationService,
-  type ElevationServiceParams,
-  createElevationService,
-};
+            Effect.tryPromise(() =>
+              crypto.subtle.digest(DIGEST, encoder.encode(account.id)),
+            ),
+            Effect.tryPromise(() =>
+              crypto.subtle.digest(
+                DIGEST,
+                encoder.encode(challengeMetadata.test),
+              ),
+            ),
+            Effect.tryPromise(() =>
+              crypto.subtle.digest(DIGEST, encoder.encode(tokenInfo.name)),
+            ),
+          ] as const).pipe(
+            Effect.map(
+              ([h1, h2, h3, h4]) =>
+                [
+                  Buffer.from(h1),
+                  Buffer.from(h2),
+                  Buffer.from(h3),
+                  Buffer.from(h4),
+                ] as const,
+            ),
+            Effect.mapError(
+              (): AppError => ({
+                errorCode: AppErrorCode.UNKNOWN,
+                message:
+                  "An error occurred when tried to verify the solution. Try again starting a new elevation challenge",
+              }),
+            ),
+          );
+          yield* Effect.all([
+            Effect.succeed(timingSafeEqual(expectedAccountId, actualAccountId)),
+            Effect.succeed(timingSafeEqual(expectedSolution, actualSolution)),
+          ]).pipe(
+            Effect.map(
+              ([accountVerification, solutionVerification]) =>
+                accountVerification && solutionVerification,
+            ),
+            Effect.filterOrFail(
+              (isValid) => isValid,
+              (): AppError => ({
+                errorCode: AppErrorCode.UNKNOWN,
+                message:
+                  "Wrong solution. Either the solution does not belong to the expected account, or the name of the token is not the expected one",
+              }),
+            ),
+          );
+          const signingKey = yield* Effect.tryPromise({
+            try: () => calculateHkdf(config.ikm, DIGEST, account.id),
+            catch: (): AppError => ({
+              errorCode: AppErrorCode.UNKNOWN,
+              message:
+                "Could not elevate privileges right now. Try again later",
+            }),
+          });
+          return yield* Effect.tryPromise({
+            try: () =>
+              crypto.subtle.sign(
+                "HMAC",
+                signingKey,
+                Buffer.from(challengeMetadata.tokenId),
+              ),
+            catch: (): AppError => ({
+              errorCode: AppErrorCode.UNKNOWN,
+              message:
+                "Could not elevate privileges right now. Try again later",
+            }),
+          }).pipe(
+            Effect.map((signature) =>
+              Buffer.from(signature).toString("base64"),
+            ),
+          );
+        }),
+    });
+  }),
+);

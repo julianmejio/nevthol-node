@@ -20,9 +20,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@repo/contracts": "workspace:*",
     "@repo/authentication-store": "workspace:*",
+    "@repo/contracts": "workspace:*",
     "@repo/gw2api-adapter": "workspace:*",
+    "effect": "^3.21.4",
     "jsonwebtoken": "^9.0.3",
     "nanoid": "^5.1.11"
   },
