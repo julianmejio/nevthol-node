@@ -1,5 +1,6 @@
-interface RedisAdapterParameters {
-  url: string;
+import { Context } from "effect";
+export interface RedisAdapterParameters {
+  readonly url: string;
 }
-
-export type { RedisAdapterParameters };
+export const RedisAdapterParameters =
+  Context.GenericTag<RedisAdapterParameters>("RedisAdapterParameters");

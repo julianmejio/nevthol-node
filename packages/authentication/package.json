@@ -14,6 +14,10 @@
     "./authentication-service": {
       "types": "./src/authenticationService.d.ts",
       "import": "./dist/authenticationService.js"
+    },
+    "./elevation-service": {
+      "types": "./src/elevationService.d.ts",
+      "import": "./dist/elevationService.js"
     }
   },
   "keywords": [],

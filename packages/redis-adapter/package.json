@@ -4,6 +4,10 @@
   "private": true,
   "description": "",
   "exports": {
+    "./elevation-store": {
+      "types": "./dist/elevation-store.d.ts",
+      "import": "./dist/elevation-store.js"
+    },
     "./transmitter": {
       "types": "./dist/transmitter.d.ts",
       "import": "./dist/transmitter.js"
@@ -37,8 +41,11 @@
     "@repo/broadcasting": "workspace:*",
     "@repo/contracts": "workspace:*",
     "@repo/core": "workspace:*",
+    "@repo/authentication-store": "workspace:*",
     "@repo/session": "workspace:*",
     "@repo/tracker": "workspace:*",
+    "@repo/logger": "workspace:*",
+    "effect": "^3.21.4",
     "redis": "^6.0.0"
   },
   "devDependencies": {

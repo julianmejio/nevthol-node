@@ -27,7 +27,7 @@ type AppErrorCodeEnum = z.infer<typeof AppErrorCodeEnum>;
  * Schema that describes the shape of an error response
  */
 const AppErrorSchema = z.object({
-  errorCode: AppErrorCode,
+  errorCode: AppErrorCodeEnum,
   message: z.string().optional().describe("Descriptive message of the error"),
 });
 

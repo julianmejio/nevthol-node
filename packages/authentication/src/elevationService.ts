@@ -5,6 +5,7 @@ import type {
   ChallengePuzzle,
   ChallengeSolution,
   ChallengeMetadata,
+  Passport,
 } from "@repo/contracts/api-gateway/elevation";
 import { ElevationStore } from "@repo/authentication-store/elevation-store";
 import { Effect, Context, Layer } from "effect";
@@ -53,7 +54,7 @@ export interface ElevationService {
   ) => Effect.Effect<ChallengePuzzle, AppError, never>;
   readonly solve: (
     solution: ChallengeSolution,
-  ) => Effect.Effect<string, AppError, never>;
+  ) => Effect.Effect<Passport, AppError, never>;
 }
 export const ElevationService =
   Context.GenericTag<ElevationService>("ElevationService");
@@ -179,8 +180,12 @@ export const ElevationServiceLive = Layer.effect(
                 "Could not elevate privileges right now. Try again later",
             }),
           }).pipe(
-            Effect.map((signature) =>
-              Buffer.from(signature).toString("base64"),
+            Effect.map(
+              (signature): Passport => ({
+                accountId: challengeMetadata.accountId,
+                tokenId: challengeMetadata.tokenId,
+                signature: Buffer.from(signature).toString("base64"),
+              }),
             ),
           );
         }),

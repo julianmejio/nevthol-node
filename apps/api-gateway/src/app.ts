@@ -4,6 +4,7 @@ import helmet from "helmet";
 import authenticationRoutes from "./routes/authentication";
 import type { Logger } from "@repo/logger";
 import { errorHandler } from "./middleware/errorHandler";
+import elevationRouter from "./routes/elevation.routes";
 
 const createExpress = ({ logger }: { logger: Logger }): Express => {
   const app: Express = express();
@@ -15,6 +16,7 @@ const createExpress = ({ logger }: { logger: Logger }): Express => {
   app.use(express.urlencoded({ extended: true }));
 
   app.use("/authentication", authenticationRoutes);
+  app.use("/elevation", elevationRouter);
 
   app.use(errorHandler);
 

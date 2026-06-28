@@ -6,7 +6,9 @@
   ],
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "strict": true,
+    "skipLibCheck": true
   },
   "include": [
     "src"

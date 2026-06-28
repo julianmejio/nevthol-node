@@ -26,6 +26,9 @@ importers:
       '@repo/authentication':
         specifier: workspace:*
         version: link:../../packages/authentication
+      '@repo/authentication-store':
+        specifier: workspace:*
+        version: link:../../packages/authentication-store
       '@repo/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
@@ -38,9 +41,15 @@ importers:
       '@repo/logger':
         specifier: workspace:*
         version: link:../../packages/logger
+      '@repo/redis-adapter':
+        specifier: workspace:*
+        version: link:../../packages/redis-adapter
       cors:
         specifier: ^2.8.6
         version: 2.8.6
+      effect:
+        specifier: ^3.21.4
+        version: 3.21.4
       express:
         specifier: ^5.2.1
         version: 5.2.1
@@ -745,6 +754,9 @@ importers:
 
   packages/redis-adapter:
     dependencies:
+      '@repo/authentication-store':
+        specifier: workspace:*
+        version: link:../authentication-store
       '@repo/broadcasting':
         specifier: workspace:*
         version: link:../broadcasting
@@ -754,12 +766,18 @@ importers:
       '@repo/core':
         specifier: workspace:*
         version: link:../core
+      '@repo/logger':
+        specifier: workspace:*
+        version: link:../logger
       '@repo/session':
         specifier: workspace:*
         version: link:../session
       '@repo/tracker':
         specifier: workspace:*
         version: link:../tracker
+      effect:
+        specifier: ^3.21.4
+        version: 3.21.4
       redis:
         specifier: ^6.0.0
         version: 6.0.0
