@@ -9,12 +9,12 @@ import {
   type TokenInfo,
   TokenInfoSchema,
 } from "@repo/contracts/gw2/v2";
+import { Effect, Layer } from "effect";
 import {
   type AppError,
-  AppErrorCode,
   type AppErrorCodeEnum,
+  ErrorCode,
 } from "@repo/contracts/error";
-import { Effect, Layer } from "effect";
 
 const failWithNetworkError = (message: string, errorCode: AppErrorCodeEnum) =>
   Effect.fail<AppError>({
@@ -34,7 +34,7 @@ export const createAccountClient = (): IAccountClient => {
           parameters: null,
         },
         authorizationToken: gw2Token as string,
-        gw2ErrorCode: AppErrorCode.GW2_API_ERROR,
+        gw2ErrorCode: ErrorCode.ERROR_GW2_UPSTREAM_UNEXPECTED_RESPONSE,
       });
     },
     getAllCharacters: async () => {
@@ -72,16 +72,20 @@ export const AccountApiLive = Layer.succeed(
             authorizationToken: token,
           }),
         catch: (error: unknown): AppError => ({
-          errorCode: AppErrorCode.GW2_API_ERROR,
-          message: (error as ErrorResponse)?.text || "Unknown error",
+          errorCode: ErrorCode.ERROR_GW2_UPSTREAM_UNABLE_TO_CONTACT,
+          message:
+            (error as ErrorResponse)?.text ||
+            "Could not connect to Guild Wars 2",
         }),
       }).pipe(
         Effect.flatMap((response) => {
           const parsed = AccountSchema.safeParse(response);
           if (!parsed.success) {
             return failWithNetworkError(
-              parsed.error.message,
-              AppErrorCode.GW2_API_ERROR,
+              parsed.error.issues
+                .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
+                .join("\r\n"),
+              ErrorCode.ERROR_GW2_UPSTREAM_UNEXPECTED_RESPONSE,
             );
           }
           return Effect.succeed(parsed.data);
@@ -98,8 +102,10 @@ export const AccountApiLive = Layer.succeed(
             authorizationToken: token,
           }),
         catch: (error: unknown): AppError => ({
-          errorCode: AppErrorCode.GW2_API_ERROR,
-          message: (error as ErrorResponse)?.text || "Unknown error",
+          errorCode: ErrorCode.ERROR_GW2_UPSTREAM_UNABLE_TO_CONTACT,
+          message:
+            (error as ErrorResponse)?.text ||
+            "Could not connect to Guild Wars 2",
         }),
       }).pipe(
         Effect.flatMap((response) => {
@@ -107,7 +113,7 @@ export const AccountApiLive = Layer.succeed(
           if (!parsed.success) {
             return failWithNetworkError(
               parsed.error.message,
-              AppErrorCode.GW2_API_ERROR,
+              ErrorCode.ERROR_GW2_UPSTREAM_UNEXPECTED_RESPONSE,
             );
           }
           return Effect.succeed(parsed.data);
@@ -124,8 +130,10 @@ export const AccountApiLive = Layer.succeed(
             authorizationToken: token,
           }),
         catch: (error: unknown): AppError => ({
-          errorCode: AppErrorCode.GW2_API_ERROR,
-          message: (error as ErrorResponse)?.text || "Unknown error",
+          errorCode: ErrorCode.ERROR_GW2_UPSTREAM_UNABLE_TO_CONTACT,
+          message:
+            (error as ErrorResponse)?.text ||
+            "Could not connect to Guild Wars 2",
         }),
       }).pipe(
         Effect.flatMap((response) => {
@@ -133,7 +141,7 @@ export const AccountApiLive = Layer.succeed(
           if (!parsed.success) {
             return failWithNetworkError(
               parsed.error.message,
-              AppErrorCode.GW2_API_ERROR,
+              ErrorCode.ERROR_GW2_UPSTREAM_UNEXPECTED_RESPONSE,
             );
           }
           return Effect.succeed(parsed.data);

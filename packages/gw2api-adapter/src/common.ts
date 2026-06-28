@@ -1,8 +1,8 @@
 import { z } from "zod";
 import {
   type AppError,
-  AppErrorCode,
   type AppErrorCodeEnum,
+  ErrorCode,
 } from "@repo/contracts/error";
 
 /**
@@ -72,7 +72,7 @@ const fetchApi = async <T>(params: fetchApiParams): Promise<T | AppError> => {
     console.error("Error in fetchApi", responseText);
 
     return {
-      errorCode: params.gw2ErrorCode || AppErrorCode.GW2_API_ERROR,
+      errorCode: params.gw2ErrorCode || ErrorCode.ERROR_GW2_UPSTREAM_OTHER,
       message: response.statusText,
     };
   }

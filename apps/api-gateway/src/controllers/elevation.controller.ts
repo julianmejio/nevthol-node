@@ -8,8 +8,8 @@ import {
   type PostSolveResponse,
 } from "@repo/contracts/api-gateway/elevation";
 import { Effect } from "effect";
-import { type AppError, AppErrorCode } from "@repo/contracts/error";
 import { ElevationService } from "@repo/authentication/elevation-service";
+import { type AppError, ErrorCode } from "@repo/contracts/error";
 
 export const ElevationController = {
   postChallenge: (
@@ -20,7 +20,7 @@ export const ElevationController = {
       const body = PostChallengeRequestSchema.safeParse(req.body);
       if (!body.success) {
         return yield* Effect.fail<AppError>({
-          errorCode: AppErrorCode.UNKNOWN,
+          errorCode: ErrorCode.ERROR_AUTHENTICATION_BAD_CREDENTIAL,
           message: body.error.issues
             .map((e) => `${e.path.join(".")}: ${e.message}`)
             .join(", "),
@@ -47,8 +47,10 @@ export const ElevationController = {
       const parsedFullRequest = PostSolveRequestSchema.safeParse(fullRequest);
       if (!parsedFullRequest.success) {
         return yield* Effect.fail<AppError>({
-          errorCode: AppErrorCode.UNKNOWN,
-          message: parsedFullRequest.error.message,
+          errorCode: ErrorCode.ERROR_AUTHENTICATION_BAD_CREDENTIAL,
+          message: parsedFullRequest.error.issues
+            .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
+            .join("\r\n"),
         });
       }
       const passport = yield* elevationService.solve(parsedFullRequest.data);

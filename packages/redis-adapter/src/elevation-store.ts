@@ -3,9 +3,9 @@ import { ElevationStore } from "@repo/authentication-store/elevation-store";
 import { RedisAdapterParameters } from "./configuration.js";
 import { createClient } from "redis";
 import { createLogger } from "@repo/logger";
-import { type AppError, AppErrorCode } from "@repo/contracts/error";
 import { getNamespace } from "./common.js";
 import { ChallengeMetadataSchema } from "@repo/contracts/api-gateway/elevation";
+import { type AppError, ErrorCode } from "@repo/contracts/error";
 
 const log = createLogger({
   serviceName: "elevation-store",
@@ -26,7 +26,7 @@ export const ElevationStoreLive = Layer.scoped(
         yield* Effect.tryPromise({
           try: () => redisClient.connect(),
           catch: (): AppError => ({
-            errorCode: AppErrorCode.UNKNOWN,
+            errorCode: ErrorCode.ERROR_REDIS_COULD_NOT_SAVE_VALUE,
             message: "Could not connect to memory storage",
           }),
         });
@@ -55,8 +55,8 @@ export const ElevationStoreLive = Layer.scoped(
               .exec();
           },
           catch: (): AppError => ({
-            errorCode: AppErrorCode.UNKNOWN,
-            message: "The challenge could not be registered.",
+            errorCode: ErrorCode.ERROR_REDIS_COULD_NOT_SAVE_VALUE,
+            message: "Could not save the challenge in memory.",
           }),
         }),
 
@@ -69,12 +69,11 @@ export const ElevationStoreLive = Layer.scoped(
             );
             const challenge = await client.hGetAll(key);
             const safeChallenge = ChallengeMetadataSchema.parse(challenge);
-            console.log("Challenge retrieves is", safeChallenge);
             await client.unlink(key);
             return safeChallenge;
           },
           catch: (): AppError => ({
-            errorCode: AppErrorCode.UNKNOWN,
+            errorCode: ErrorCode.ERROR_AUTHENTICATION_CHALLENGE_EXPIRED,
             message: "Challenge is not valid anymore.",
           }),
         }),

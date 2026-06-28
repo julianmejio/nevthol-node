@@ -9,7 +9,7 @@ import type {
 } from "@repo/contracts/api-gateway/elevation";
 import { ElevationStore } from "@repo/authentication-store/elevation-store";
 import { Effect, Context, Layer } from "effect";
-import { type AppError, AppErrorCode } from "@repo/contracts/error";
+import { type AppError, ErrorCode } from "@repo/contracts/error";
 
 const DIGEST = "SHA-256";
 const TEST_API_KEY_NAME_PREFIX = "gwradar.com_verify_account_";
@@ -136,9 +136,8 @@ export const ElevationServiceLive = Layer.effect(
             ),
             Effect.mapError(
               (): AppError => ({
-                errorCode: AppErrorCode.UNKNOWN,
-                message:
-                  "An error occurred when tried to verify the solution. Try again starting a new elevation challenge",
+                errorCode: ErrorCode.ERROR_COULD_NOT_FINISH_CRYPTO,
+                message: "Could not verify the solution due to a crypto error",
               }),
             ),
           );
@@ -153,7 +152,8 @@ export const ElevationServiceLive = Layer.effect(
             Effect.filterOrFail(
               (isValid) => isValid,
               (): AppError => ({
-                errorCode: AppErrorCode.UNKNOWN,
+                errorCode:
+                  ErrorCode.ERROR_AUTHENTICATION_BAD_CHALLENGE_SOLUTION,
                 message:
                   "Wrong solution. Either the solution does not belong to the expected account, or the name of the token is not the expected one",
               }),
@@ -162,9 +162,8 @@ export const ElevationServiceLive = Layer.effect(
           const signingKey = yield* Effect.tryPromise({
             try: () => calculateHkdf(config.ikm, DIGEST, account.id),
             catch: (): AppError => ({
-              errorCode: AppErrorCode.UNKNOWN,
-              message:
-                "Could not elevate privileges right now. Try again later",
+              errorCode: ErrorCode.ERROR_COULD_NOT_FINISH_CRYPTO,
+              message: "Could not generate HKDF for specific account",
             }),
           });
           return yield* Effect.tryPromise({
@@ -175,9 +174,9 @@ export const ElevationServiceLive = Layer.effect(
                 Buffer.from(challengeMetadata.tokenId),
               ),
             catch: (): AppError => ({
-              errorCode: AppErrorCode.UNKNOWN,
+              errorCode: ErrorCode.ERROR_COULD_NOT_FINISH_CRYPTO,
               message:
-                "Could not elevate privileges right now. Try again later",
+                "Could not calculate the HMAC for the elevation signature",
             }),
           }).pipe(
             Effect.map(

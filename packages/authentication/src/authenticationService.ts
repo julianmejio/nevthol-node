@@ -6,10 +6,10 @@ import {
   PostAuthenticateRequestSchema,
   type PostAuthenticateResponse,
 } from "@repo/contracts/api-gateway/authentication";
-import { AppErrorCode } from "@repo/contracts/error";
 import { TokenInfoSchema } from "@repo/contracts/gw2/v2";
 import jwt, { type SignOptions } from "jsonwebtoken";
 import { nanoid } from "nanoid";
+import { ErrorCode } from "@repo/contracts/error";
 
 interface IAuthenticationService {
   getAuthenticationJwtByGw2ApiKey: (
@@ -94,14 +94,14 @@ const createAuthenticationService = (
         console.debug(requestValidation.error);
         return {
           status: "error",
-          errorCode: AppErrorCode.AUTHENTICATION_GENERIC_ERROR,
+          errorCode: ErrorCode.ERROR_AUTHENTICATION_BAD_CREDENTIAL,
           message: "Authentication request is malformed",
         };
       }
       if (!(await isValidGw2Token(requestValidation.data.gw2token))) {
         return {
           status: "error",
-          errorCode: AppErrorCode.AUTHENTICATION_GENERIC_ERROR,
+          errorCode: ErrorCode.ERROR_AUTHENTICATION_BAD_CREDENTIAL,
           message: "Token is not valid",
         };
       }
@@ -111,7 +111,7 @@ const createAuthenticationService = (
       if (null === characterList) {
         return {
           status: "error",
-          errorCode: AppErrorCode.GW2_ACCOUNT_INVALID_CHARACTER_LIST,
+          errorCode: ErrorCode.ERROR_AUTHENTICATION_BAD_CREDENTIAL,
           message:
             "No valid character list (or no characters at all) have been found. Have you forgotten 'characters' permission? Try with an account with at least one character",
         };
@@ -131,7 +131,7 @@ const createAuthenticationService = (
         if (null === jwt) {
           return {
             status: "error",
-            errorCode: AppErrorCode.AUTHENTICATION_GENERIC_ERROR,
+            errorCode: ErrorCode.ERROR_AUTHENTICATION_OTHER,
             message: "Could not generate an authentication token",
           };
         }
@@ -142,7 +142,7 @@ const createAuthenticationService = (
       } catch {
         return {
           status: "error",
-          errorCode: AppErrorCode.AUTHENTICATION_GENERIC_ERROR,
+          errorCode: ErrorCode.ERROR_AUTHENTICATION_OTHER,
           message: "An error occurred when tried to authenticate the user",
         };
       }
