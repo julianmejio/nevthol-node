@@ -5,6 +5,7 @@ export const ErrorCategory = {
   ERROR_AUTHENTICATION: 0x1 << 4,
   ERROR_GW2_UPSTREAM: 0x2 << 4,
   ERROR_REDIS: 0x3 << 4,
+  ERROR_GENERAL: 0xe << 4,
   ERROR_UNKNOWN: 0xf << 4,
 } as const;
 
@@ -32,6 +33,10 @@ export const ErrorCode = {
   ERROR_REDIS_COULD_NOT_SAVE_VALUE: ErrorCategory.ERROR_REDIS | 0x2,
   ERROR_REDIS_COULD_NOT_RETRIEVE_VALUE: ErrorCategory.ERROR_REDIS | 0x3,
   ERROR_REDIS_OTHER: ErrorCategory.ERROR_REDIS | 0x0,
+
+  // General
+  ERROR_GENERAL_BAD_INPUT: ErrorCategory.ERROR_GENERAL | 0x1,
+  ERROR_GENERAL_OTHER: ErrorCategory.ERROR_GENERAL | 0x0,
 
   // Catch-all errors
   ERROR_COULD_NOT_FINISH_CRYPTO: ErrorCategory.ERROR_SYSTEM | 0x1,

@@ -1,13 +1,9 @@
 import { z } from "zod";
-import {
-  BaseErrorApiResponseSchema,
-  BaseSuccessResponseSchema,
-} from "./response-common.js";
 
 /**
  * Levels of authentication
  */
-const AuthenticationLevel = {
+export const AuthenticationLevel = {
   /** The client has been authenticated using a key that has not been verified. */
   Authenticated: 0,
   /** The client has been authenticated using a verified key that demonstrates ownership. */
@@ -17,38 +13,42 @@ const AuthenticationLevel = {
 /**
  * Levels of authentication.
  */
-const AuthenticationLevelEnum = z
+export const AuthenticationLevelEnumSchema = z
   .enum(AuthenticationLevel)
   .describe("Authentication levels");
 /**
  * Levels of authentication.
  */
-type AuthenticationLevelEnum = z.infer<typeof AuthenticationLevelEnum>;
+export type AuthenticationLevelEnum = z.infer<
+  typeof AuthenticationLevelEnumSchema
+>;
 
 /**
  * List of properties that an authentication badge (JWT or cookie) contains.
  */
-const AuthenticationAttributesSchema = z.object({
+export const AuthenticationClaimSetSchema = z.object({
   /** Comma-separated list of character names. */
   chl: z
     .string()
     .regex(/^\p{Lu}\p{Ll}*(?:[\s,]\p{Lu}\p{Ll}*)*$/u)
     .describe("Comma-separated list of character names"),
-  aut: AuthenticationLevelEnum,
+  aut: AuthenticationLevelEnumSchema,
 });
 /**
  * List of properties that an authentication badge (JWT or cookie) contains.
  */
-type AuthenticationAttributes = z.infer<typeof AuthenticationAttributesSchema>;
+export type AuthenticationClaimSet = z.infer<
+  typeof AuthenticationClaimSetSchema
+>;
 
 /**
  * Schema that supports and validates Guild Wars 2 API key subtokens.
  * @see [GW2 API subtoken creation]{@link https://wiki.guildwars2.com/wiki/API:2/createsubtoken}.
  */
-const PostAuthenticateRequestSchema = z
+export const PostAuthenticateRequestSchema = z
   .object({
     /** GW2 API token, either a key or a subtoken */
-    gw2token: z
+    token: z
       .union([
         z
           .jwt({ error: "JWT Token is malformed" })
@@ -66,27 +66,17 @@ const PostAuthenticateRequestSchema = z
  * Schema that supports and validates Guild Wars 2 API key subtokens.
  * @see [GW2 API subtoken creation]{@link https://wiki.guildwars2.com/wiki/API:2/createsubtoken}.
  */
-type PostAuthenticateRequest = z.infer<typeof PostAuthenticateRequestSchema>;
+export type PostAuthenticateRequest = z.infer<
+  typeof PostAuthenticateRequestSchema
+>;
 
-const PostAuthenticateResponseSchema = z.discriminatedUnion("status", [
-  BaseSuccessResponseSchema.extend({
-    token: z.jwt().describe("JWT token for authenticating against the ws"),
-  }),
-  BaseErrorApiResponseSchema,
-]);
+export const PostAuthenticateResponseSchema = z.object({
+  jwt: z.jwt(),
+});
 
 /**
  * Schema that validates the POST authentication response from the API.
  */
-type PostAuthenticateResponse = z.infer<typeof PostAuthenticateResponseSchema>;
-
-export {
-  AuthenticationLevel,
-  AuthenticationLevelEnum,
-  AuthenticationAttributesSchema,
-  PostAuthenticateRequestSchema,
-  PostAuthenticateResponseSchema,
-  type AuthenticationAttributes,
-  type PostAuthenticateRequest,
-  type PostAuthenticateResponse,
-};
+export type PostAuthenticateResponse = z.infer<
+  typeof PostAuthenticateResponseSchema
+>;

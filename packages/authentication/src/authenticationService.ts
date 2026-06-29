@@ -1,153 +1,73 @@
-import type { IAccountClient } from "@repo/game-api/account";
+import { AccountApi } from "@repo/game-api/account";
 import {
-  type AuthenticationAttributes,
+  type AuthenticationClaimSet,
   AuthenticationLevel,
-  type PostAuthenticateRequest,
-  PostAuthenticateRequestSchema,
   type PostAuthenticateResponse,
 } from "@repo/contracts/api-gateway/authentication";
-import { TokenInfoSchema } from "@repo/contracts/gw2/v2";
-import jwt, { type SignOptions } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { nanoid } from "nanoid";
-import { ErrorCode } from "@repo/contracts/error";
+import { type AppError, ErrorCode } from "@repo/contracts/error";
+import { Context, Effect, Layer } from "effect";
 
-interface IAuthenticationService {
-  getAuthenticationJwtByGw2ApiKey: (
-    request: PostAuthenticateRequest,
-    privateKey: string,
-    metaDataJwt?: Partial<Pick<SignOptions, "issuer" | "audience" | "subject">>,
-  ) => Promise<PostAuthenticateResponse>;
-  isValidGw2Token: (gw2Token: string) => Promise<boolean>;
-  getCharacterList: (gw2Token: string) => Promise<string[] | null>;
-  signJwt: <T extends object>(
-    privateKey: string,
-    contents: T,
-    options: Omit<SignOptions, "algorithm">,
-  ) => string | null;
+const JWT_EXPIRATION_SPAN = "10s";
+
+export interface AuthenticationServiceConfig {
+  privateKey?: string;
+  publicKey?: string;
 }
+export const AuthenticationServiceConfig =
+  Context.GenericTag<AuthenticationServiceConfig>(
+    "AuthenticationServiceConfig",
+  );
 
-const createAuthenticationService = (
-  accountClient: IAccountClient,
-): IAuthenticationService => {
-  const isValidGw2Token = async (gw2Token: string) => {
-    try {
-      accountClient.authenticate(gw2Token);
-      const tokenInformation = await accountClient.getTokenInfo();
-      const result = TokenInfoSchema.safeParse(tokenInformation);
-      return result.success;
-    } catch {
-      return false;
-    }
-  };
-  const getCharacterList = async (
-    gw2Token: string,
-  ): Promise<string[] | null> => {
-    try {
-      accountClient.authenticate(gw2Token);
-      const characterList = await accountClient.getAllCharacters();
-      if (!Array.isArray(characterList)) {
-        return null;
-      }
-      return characterList;
-    } catch {
-      return null;
-    }
-  };
-  const signJwt = <T extends object>(
-    privateKey: string,
-    payload: T,
-    options: Omit<SignOptions, "algorithm"> = {},
-  ): string | null => {
-    const defaultOptions: SignOptions = {
-      expiresIn: "10s",
-      notBefore: 0,
-      jwtid: nanoid(14),
-    };
-    try {
-      return jwt.sign(payload, privateKey, {
-        ...defaultOptions,
-        ...options,
-        ...({ algorithm: "ES256" } as SignOptions),
-      });
-    } catch {
-      return null;
-    }
-  };
-  return {
-    isValidGw2Token: (gw2Token: string) => isValidGw2Token(gw2Token),
-    getCharacterList: (gw2Token: string) => getCharacterList(gw2Token),
-    signJwt: <T extends object>(
-      privateKey: string,
-      payload: T,
-      options: Omit<SignOptions, "algorithm"> = {},
-    ) => signJwt<T>(privateKey, payload, options),
-    getAuthenticationJwtByGw2ApiKey: async (
-      request: PostAuthenticateRequest,
-      privateKey: string,
-      metaDataJwt: Partial<
-        Pick<SignOptions, "issuer" | "audience" | "subject">
-      > = {},
-    ): Promise<PostAuthenticateResponse> => {
-      const requestValidation =
-        PostAuthenticateRequestSchema.safeParse(request);
-      if (!requestValidation.success) {
-        console.debug(requestValidation.error);
-        return {
-          status: "error",
-          errorCode: ErrorCode.ERROR_AUTHENTICATION_BAD_CREDENTIAL,
-          message: "Authentication request is malformed",
-        };
-      }
-      if (!(await isValidGw2Token(requestValidation.data.gw2token))) {
-        return {
-          status: "error",
-          errorCode: ErrorCode.ERROR_AUTHENTICATION_BAD_CREDENTIAL,
-          message: "Token is not valid",
-        };
-      }
-      const characterList = await getCharacterList(
-        requestValidation.data.gw2token,
-      );
-      if (null === characterList) {
-        return {
-          status: "error",
-          errorCode: ErrorCode.ERROR_AUTHENTICATION_BAD_CREDENTIAL,
-          message:
-            "No valid character list (or no characters at all) have been found. Have you forgotten 'characters' permission? Try with an account with at least one character",
-        };
-      }
-      try {
-        const connectionId = nanoid(10);
-        const jwt = signJwt<AuthenticationAttributes>(
-          privateKey,
-          {
-            chl: characterList.join(","),
-            // Hardcoded authentication level
-            // TODO: Verification mechanism.
+export interface AuthenticationService {
+  readonly authenticate: (
+    token: string,
+  ) => Effect.Effect<PostAuthenticateResponse, AppError, never>;
+}
+export const AuthenticationService = Context.GenericTag<AuthenticationService>(
+  "AuthenticationService",
+);
+
+export const AuthenticationServiceLive = Layer.effect(
+  AuthenticationService,
+  Effect.gen(function* () {
+    const config = yield* AuthenticationServiceConfig;
+    const api = yield* AccountApi;
+    return {
+      authenticate: (token: string) =>
+        Effect.gen(function* () {
+          const privateKey = yield* Effect.fromNullable(config.privateKey).pipe(
+            Effect.mapError(
+              (): AppError => ({
+                errorCode: ErrorCode.ERROR_COULD_NOT_FINISH_CRYPTO,
+                message: "No private key provided for JWT signing",
+              }),
+            ),
+          );
+          const characters = yield* api.getCharacters(token).pipe(
+            Effect.mapError(
+              (): AppError => ({
+                errorCode: ErrorCode.ERROR_AUTHENTICATION_BAD_CREDENTIAL,
+                message:
+                  'Could not retrieve the list of characters. Check that the token provided has the "characters" permission',
+              }),
+            ),
+          );
+          const claimSet: AuthenticationClaimSet = {
+            // TODO: Verify authentication signature
             aut: AuthenticationLevel.Authenticated,
-          },
-          { ...metaDataJwt, jwtid: connectionId },
-        );
-        if (null === jwt) {
-          return {
-            status: "error",
-            errorCode: ErrorCode.ERROR_AUTHENTICATION_OTHER,
-            message: "Could not generate an authentication token",
+            chl: characters.join(","),
           };
-        }
-        return {
-          status: "success",
-          token: jwt,
-        };
-      } catch {
-        return {
-          status: "error",
-          errorCode: ErrorCode.ERROR_AUTHENTICATION_OTHER,
-          message: "An error occurred when tried to authenticate the user",
-        };
-      }
-    },
-  };
-};
-
-export { createAuthenticationService };
+          const authToken = jwt.sign(claimSet, privateKey, {
+            expiresIn: JWT_EXPIRATION_SPAN,
+            algorithm: "ES256",
+            jwtid: nanoid(14),
+          });
+          return {
+            jwt: authToken,
+          };
+        }),
+    };
+  }),
+);

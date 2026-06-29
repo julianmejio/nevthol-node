@@ -8,6 +8,10 @@ import {
   ElevationServiceConfig,
   ElevationServiceLive,
 } from "../src/elevationService.js";
+import {
+  AuthenticationServiceConfig,
+  AuthenticationServiceLive,
+} from "../src/authenticationService.js";
 
 export const createMockAccountApi = (
   overrides?: Partial<AccountApi>,
@@ -60,12 +64,28 @@ export const MockElevationConfigLayer = Layer.succeed(ElevationServiceConfig, {
   ikm: Buffer.from("PAcR9G2CbwEC2GJMjtwCmE82uXxJ06YUUSUAYK64ATM=", "base64"),
 });
 
+export const MockAuthenticationConfigLayer = Layer.succeed(
+  AuthenticationServiceConfig,
+  {
+    privateKey:
+      "-----BEGIN EC PRIVATE KEY-----\n" +
+      "MHcCAQEEINcU/uurc/AiZegj0tMLM9Qi6APdzLY4dehUqDVgUjhqoAoGCCqGSM49\n" +
+      "AwEHoUQDQgAEmb8TnUzXtz8i56Kk/p+96LyqyOo5L7na6MkpIZfukTFv6ka0NsmY\n" +
+      "SgkvXfBgSo6M1ACUi1xgt5yPifEBGL1P/g==\n" +
+      "-----END EC PRIVATE KEY-----",
+  },
+);
+
 const MockDependencies = Layer.mergeAll(
   MockAccountApiLayer,
   MockElevationStoreLayer,
   MockElevationConfigLayer,
+  MockAuthenticationConfigLayer,
 );
 
-export const TestEnvironment = ElevationServiceLive.pipe(
-  Layer.provide(MockDependencies),
+const Services = Layer.mergeAll(
+  ElevationServiceLive,
+  AuthenticationServiceLive,
 );
+
+export const TestEnvironment = Services.pipe(Layer.provide(MockDependencies));

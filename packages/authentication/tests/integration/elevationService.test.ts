@@ -27,7 +27,10 @@ describe("Elevation service", () => {
     const signature = await Effect.runPromise(
       program.pipe(Effect.provide(TestEnvironment)),
     );
-
-    expect(signature).toBeTypeOf("string");
+    expect(signature).toEqual({
+      accountId: "00000000-0000-0000-0000-000000000000",
+      tokenId: "00000000-0000-0000-0000-000000000000",
+      signature: expect.stringMatching(/^[A-Za-z0-9+/]+={0,2}$/),
+    });
   });
 });
