@@ -34,11 +34,12 @@ const ElevationStoreLayer = ElevationStoreLive.pipe(
 const ElevationServiceLayer = ElevationServiceLive.pipe(
   Layer.provide(AccountApiLive),
   Layer.provide(ElevationStoreLayer),
-  Layer.provide(ElevationServiceConfigLayer),
+  Layer.provideMerge(ElevationServiceConfigLayer),
 );
 
 const AuthenticationServiceLayer = AuthenticationServiceLive.pipe(
-  Layer.provide(AccountApiLive),
+  Layer.provideMerge(AccountApiLive),
+  Layer.provideMerge(ElevationServiceLayer),
   Layer.provide(AuthenticationServiceConfigLayer),
 );
 

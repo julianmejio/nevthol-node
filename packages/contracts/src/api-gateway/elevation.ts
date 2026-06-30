@@ -46,6 +46,13 @@ export const PassportSchema = z.object({
 });
 export type Passport = z.infer<typeof PassportSchema>;
 
+export const PassportValidationSchema = PassportSchema.omit({
+  signature: true,
+}).extend({
+  valid: z.boolean(),
+});
+export type PassportValidation = z.infer<typeof PassportValidationSchema>;
+
 export const PostChallengeRequestSchema = z.object({
   token: z
     .union([

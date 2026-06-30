@@ -59,6 +59,12 @@ export const PostAuthenticateRequestSchema = z
           .describe("Guild Wars 2 token"),
       ])
       .describe("Guild Wars 2 token or subtoken"),
+    elevationToken: z
+      .base64()
+      .optional()
+      .describe(
+        "Token that allows the elevation of the session. If valid, it gives full access to the system with the specified account",
+      ),
   })
   .describe("Authentication payload for Guild Wars 2 subtokens");
 
@@ -72,6 +78,7 @@ export type PostAuthenticateRequest = z.infer<
 
 export const PostAuthenticateResponseSchema = z.object({
   jwt: z.jwt(),
+  claim: AuthenticationClaimSetSchema,
 });
 
 /**

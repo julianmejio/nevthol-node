@@ -8,7 +8,10 @@ import {
   type PostSolveResponse,
 } from "@repo/contracts/api-gateway/elevation";
 import { Effect } from "effect";
-import { ElevationService } from "@repo/authentication/elevation-service";
+import {
+  ElevationService,
+  type ElevationServiceConfig,
+} from "@repo/authentication/elevation-service";
 import { type AppError, ErrorCode } from "@repo/contracts/error";
 
 export const ElevationController = {
@@ -37,7 +40,11 @@ export const ElevationController = {
   postSolve: (
     req: Request,
     res: Response<PostSolveResponse>,
-  ): Effect.Effect<PostSolveResponse, AppError, ElevationService> =>
+  ): Effect.Effect<
+    PostSolveResponse,
+    AppError,
+    ElevationService | ElevationServiceConfig
+  > =>
     Effect.gen(function* () {
       const elevationService = yield* ElevationService;
       const fullRequest: PostSolveRequest = {

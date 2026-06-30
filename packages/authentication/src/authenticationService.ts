@@ -2,14 +2,66 @@ import { AccountApi } from "@repo/game-api/account";
 import {
   type AuthenticationClaimSet,
   AuthenticationLevel,
+  type AuthenticationLevelEnum,
   type PostAuthenticateResponse,
 } from "@repo/contracts/api-gateway/authentication";
 import jwt from "jsonwebtoken";
 import { nanoid } from "nanoid";
 import { type AppError, ErrorCode } from "@repo/contracts/error";
 import { Context, Effect, Layer } from "effect";
+import {
+  ElevationService,
+  type ElevationServiceConfig,
+} from "./elevationService.js";
+import type { Passport } from "@repo/contracts/api-gateway/elevation";
 
 const JWT_EXPIRATION_SPAN = "10s";
+
+const getAuthenticationLevel = (
+  passport: Passport,
+): Effect.Effect<
+  AuthenticationLevelEnum,
+  AppError,
+  ElevationService | ElevationServiceConfig
+> =>
+  Effect.gen(function* () {
+    const elevationService = yield* ElevationService;
+    return yield* elevationService.verify(passport).pipe(
+      Effect.map((result) =>
+        result.valid
+          ? AuthenticationLevel.Verified
+          : AuthenticationLevel.Authenticated,
+      ),
+      Effect.mapError(
+        (): AppError => ({
+          errorCode: ErrorCode.ERROR_COULD_NOT_FINISH_CRYPTO,
+          message:
+            "Could not verify the elevation signature during authentication",
+        }),
+      ),
+    );
+  });
+
+const getAuthenticationLevelByToken = (
+  token: string,
+  signature: string,
+): Effect.Effect<
+  AuthenticationLevelEnum,
+  AppError,
+  ElevationService | AccountApi | ElevationServiceConfig
+> =>
+  Effect.gen(function* () {
+    const api = yield* AccountApi;
+    const [account, tokenInfo] = yield* Effect.all([
+      api.getAccount(token),
+      api.getTokenInfo(token),
+    ]);
+    return yield* getAuthenticationLevel({
+      accountId: account.id,
+      tokenId: tokenInfo.id,
+      signature,
+    });
+  });
 
 export interface AuthenticationServiceConfig {
   privateKey?: string;
@@ -23,7 +75,12 @@ export const AuthenticationServiceConfig =
 export interface AuthenticationService {
   readonly authenticate: (
     token: string,
-  ) => Effect.Effect<PostAuthenticateResponse, AppError, never>;
+    elevationToken: string | undefined,
+  ) => Effect.Effect<
+    PostAuthenticateResponse,
+    AppError,
+    ElevationService | ElevationServiceConfig | AccountApi
+  >;
 }
 export const AuthenticationService = Context.GenericTag<AuthenticationService>(
   "AuthenticationService",
@@ -35,7 +92,10 @@ export const AuthenticationServiceLive = Layer.effect(
     const config = yield* AuthenticationServiceConfig;
     const api = yield* AccountApi;
     return {
-      authenticate: (token: string) =>
+      authenticate: (
+        token: string,
+        elevationToken: string | undefined = undefined,
+      ) =>
         Effect.gen(function* () {
           const privateKey = yield* Effect.fromNullable(config.privateKey).pipe(
             Effect.mapError(
@@ -55,8 +115,10 @@ export const AuthenticationServiceLive = Layer.effect(
             ),
           );
           const claimSet: AuthenticationClaimSet = {
-            // TODO: Verify authentication signature
-            aut: AuthenticationLevel.Authenticated,
+            aut:
+              undefined !== elevationToken
+                ? yield* getAuthenticationLevelByToken(token, elevationToken)
+                : AuthenticationLevel.Authenticated,
             chl: characters.join(","),
           };
           const authToken = jwt.sign(claimSet, privateKey, {
@@ -66,6 +128,7 @@ export const AuthenticationServiceLive = Layer.effect(
           });
           return {
             jwt: authToken,
+            claim: claimSet,
           };
         }),
     };

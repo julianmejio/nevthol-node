@@ -6,6 +6,7 @@ import type {
   ChallengeSolution,
   ChallengeMetadata,
   Passport,
+  PassportValidation,
 } from "@repo/contracts/api-gateway/elevation";
 import { ElevationStore } from "@repo/authentication-store/elevation-store";
 import { Effect, Context, Layer } from "effect";
@@ -37,9 +38,66 @@ const calculateHkdf = async (
     key,
     { name: "HMAC", hash: digest, length: 256 },
     false,
-    ["sign"],
+    ["sign", "verify"],
   );
 };
+
+const signElevation = (
+  accountId: string,
+  tokenId: string,
+): Effect.Effect<string, AppError, ElevationServiceConfig> =>
+  Effect.gen(function* () {
+    const config = yield* ElevationServiceConfig;
+    const hkdf = yield* Effect.tryPromise({
+      try: () => calculateHkdf(config.ikm, DIGEST, accountId),
+      catch: (): AppError => ({
+        errorCode: ErrorCode.ERROR_COULD_NOT_FINISH_CRYPTO,
+        message: "Could not calculate the HKDF key for the account",
+      }),
+    });
+    return yield* Effect.tryPromise({
+      try: () => crypto.subtle.sign("HMAC", hkdf, Buffer.from(tokenId)),
+      catch: (): AppError => ({
+        errorCode: ErrorCode.ERROR_COULD_NOT_FINISH_CRYPTO,
+        message:
+          "Could not calculate the signature for the account and token ID",
+      }),
+    }).pipe(
+      Effect.map((signature) => Buffer.from(signature).toString("base64")),
+    );
+  });
+
+const isSignatureValid = (
+  accountId: string,
+  tokenId: string,
+  signature: string,
+): Effect.Effect<boolean, AppError, ElevationServiceConfig> =>
+  Effect.gen(function* () {
+    const config = yield* ElevationServiceConfig;
+    const hkdf = yield* Effect.tryPromise({
+      try: () => calculateHkdf(config.ikm, DIGEST, accountId),
+      catch: (): AppError => ({
+        errorCode: ErrorCode.ERROR_COULD_NOT_FINISH_CRYPTO,
+        message: "Could not generate HKDF key for the account",
+      }),
+    });
+    const isValid = yield* Effect.tryPromise({
+      try: () =>
+        crypto.subtle.verify(
+          "HMAC",
+          hkdf,
+          Buffer.from(signature, "base64"),
+          Buffer.from(tokenId),
+        ),
+      catch: (): AppError => {
+        return {
+          errorCode: ErrorCode.ERROR_COULD_NOT_FINISH_CRYPTO,
+          message: `Could not verify the signature authenticity`,
+        };
+      },
+    });
+    return isValid;
+  });
 
 export interface ElevationServiceConfig {
   readonly ikm: Buffer;
@@ -54,7 +112,10 @@ export interface ElevationService {
   ) => Effect.Effect<ChallengePuzzle, AppError, never>;
   readonly solve: (
     solution: ChallengeSolution,
-  ) => Effect.Effect<Passport, AppError, never>;
+  ) => Effect.Effect<Passport, AppError, ElevationServiceConfig>;
+  readonly verify: (
+    passport: Passport,
+  ) => Effect.Effect<PassportValidation, AppError, ElevationServiceConfig>;
 }
 export const ElevationService =
   Context.GenericTag<ElevationService>("ElevationService");
@@ -64,7 +125,6 @@ export const ElevationServiceLive = Layer.effect(
   Effect.gen(function* () {
     const api = yield* AccountApi;
     const store = yield* ElevationStore;
-    const config = yield* ElevationServiceConfig;
     return ElevationService.of({
       challenge: (token: string, expirationSeconds = 300) =>
         Effect.gen(function* () {
@@ -159,34 +219,30 @@ export const ElevationServiceLive = Layer.effect(
               }),
             ),
           );
-          const signingKey = yield* Effect.tryPromise({
-            try: () => calculateHkdf(config.ikm, DIGEST, account.id),
-            catch: (): AppError => ({
-              errorCode: ErrorCode.ERROR_COULD_NOT_FINISH_CRYPTO,
-              message: "Could not generate HKDF for specific account",
-            }),
-          });
-          return yield* Effect.tryPromise({
-            try: () =>
-              crypto.subtle.sign(
-                "HMAC",
-                signingKey,
-                Buffer.from(challengeMetadata.tokenId),
-              ),
-            catch: (): AppError => ({
-              errorCode: ErrorCode.ERROR_COULD_NOT_FINISH_CRYPTO,
-              message:
-                "Could not calculate the HMAC for the elevation signature",
-            }),
-          }).pipe(
+          return yield* signElevation(
+            challengeMetadata.accountId,
+            challengeMetadata.tokenId,
+          ).pipe(
             Effect.map(
               (signature): Passport => ({
                 accountId: challengeMetadata.accountId,
                 tokenId: challengeMetadata.tokenId,
-                signature: Buffer.from(signature).toString("base64"),
+                signature,
               }),
             ),
           );
+        }),
+      verify: (passport: Passport) =>
+        Effect.gen(function* () {
+          return {
+            accountId: passport.accountId,
+            tokenId: passport.tokenId,
+            valid: yield* isSignatureValid(
+              passport.accountId,
+              passport.tokenId,
+              passport.signature,
+            ),
+          };
         }),
     });
   }),
