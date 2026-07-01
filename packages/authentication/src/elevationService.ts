@@ -131,7 +131,15 @@ export const ElevationServiceLive = Layer.effect(
           const [account, tokenInfo] = yield* Effect.all([
             api.getAccount(token),
             api.getTokenInfo(token),
-          ]);
+          ]).pipe(
+            Effect.mapError(
+              (): AppError => ({
+                errorCode: ErrorCode.ERROR_AUTHENTICATION_BAD_CREDENTIAL,
+                message:
+                  "It seems the token is invalid. please verify it and try again.",
+              }),
+            ),
+          );
 
           const challengeMetadata: ChallengeMetadata = {
             id: nanoid(),

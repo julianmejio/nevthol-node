@@ -105,20 +105,23 @@ export const AuthenticationServiceLive = Layer.effect(
               }),
             ),
           );
-          const characters = yield* api.getCharacters(token).pipe(
-            Effect.mapError(
-              (): AppError => ({
-                errorCode: ErrorCode.ERROR_AUTHENTICATION_BAD_CREDENTIAL,
-                message:
-                  'Could not retrieve the list of characters. Check that the token provided has the "characters" permission',
-              }),
-            ),
+          const [characters, authenticationLevel] = yield* Effect.all(
+            [
+              api.getCharacters(token).pipe(
+                Effect.mapError(
+                  (): AppError => ({
+                    errorCode: ErrorCode.ERROR_AUTHENTICATION_BAD_CREDENTIAL,
+                    message:
+                      'Could not retrieve the list of characters. Check that the token provided has the "characters" permission',
+                  }),
+                ),
+              ),
+              getAuthenticationLevelByToken(token, String(elevationToken)),
+            ],
+            { concurrency: "unbounded" },
           );
           const claimSet: AuthenticationClaimSet = {
-            aut:
-              undefined !== elevationToken
-                ? yield* getAuthenticationLevelByToken(token, elevationToken)
-                : AuthenticationLevel.Authenticated,
+            aut: authenticationLevel,
             chl: characters.join(","),
           };
           const authToken = jwt.sign(claimSet, privateKey, {
