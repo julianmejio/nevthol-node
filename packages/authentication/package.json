@@ -26,6 +26,7 @@
   "dependencies": {
     "@repo/authentication-store": "workspace:*",
     "@repo/contracts": "workspace:*",
+    "@repo/core": "workspace:*",
     "@repo/gw2api-adapter": "workspace:*",
     "effect": "^3.21.4",
     "jsonwebtoken": "^9.0.3",

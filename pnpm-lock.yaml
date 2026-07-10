@@ -349,6 +349,9 @@ importers:
       '@repo/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@repo/core':
+        specifier: workspace:*
+        version: link:../core
       '@repo/gw2api-adapter':
         specifier: workspace:*
         version: link:../gw2api-adapter

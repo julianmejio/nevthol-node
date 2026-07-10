@@ -6,7 +6,6 @@ import {
   type PostAuthenticateResponse,
 } from "@repo/contracts/api-gateway/authentication";
 import jwt from "jsonwebtoken";
-import { nanoid } from "nanoid";
 import { type AppError, ErrorCode } from "@repo/contracts/error";
 import { Context, Effect, Layer } from "effect";
 import {
@@ -14,6 +13,7 @@ import {
   type ElevationServiceConfig,
 } from "./elevationService.js";
 import type { Passport } from "@repo/contracts/api-gateway/elevation";
+import { generateId } from "@repo/core/id";
 
 const JWT_EXPIRATION_SPAN = "10s";
 
@@ -127,7 +127,7 @@ export const AuthenticationServiceLive = Layer.effect(
           const authToken = jwt.sign(claimSet, privateKey, {
             expiresIn: JWT_EXPIRATION_SPAN,
             algorithm: "ES256",
-            jwtid: nanoid(14),
+            jwtid: generateId(),
           });
           return {
             jwt: authToken,
