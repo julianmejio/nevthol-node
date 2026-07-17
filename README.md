@@ -1,6 +1,7 @@
-# GWRADAR
+# Real-Time Telemetry and Geospatial Tracking Platform (GWRADAR)
 
-> A real-time tracking and telemetry platform for Guild Wars 2 players, providing map-based positioning through geolocation data.
+> A distributed backend platform for ingesting high-frequency binary telemetry, processing geospatial player state in real time, and relaying position updates to connected clients. Built on Node.js, Apache Kafka, and Redis, structured as a hexagonal architecture monorepo with Turborepo, and deployed on AWS MSK and ElastiCache.
+The platform uses Guild Wars 2 as its telemetry source via the MumbleLink shared memory interface, abstracted through Blish HUD.
 
 ---
 
