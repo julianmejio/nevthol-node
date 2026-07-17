@@ -9,6 +9,10 @@
       "types": "./dist/generated/pb/*.d.ts",
       "import": "./dist/generated/pb/*.js"
     },
+    "./connection": {
+      "types": "./dist/connection/connection.events.d.ts",
+      "import": "./dist/connection/connection.events.js"
+    },
     "./player": {
       "types": "./dist/player.d.ts",
       "import": "./dist/player.js"
