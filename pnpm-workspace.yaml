@@ -1,6 +1,6 @@
 packages:
   - "apps/*"
-  - "packages/*"
+  - "packages/**/*"
 allowBuilds:
   '@bufbuild/buf': true
   cpu-features: true

@@ -1,49 +1,61 @@
-import { AppErrorCode } from "@repo/contracts/error";
 import type { NextFunction, Request, Response } from "express";
-import type { BaseErrorApiResponse } from "@repo/contracts/api-gateway/response-common";
+import type { FiberFailure } from "effect/Runtime";
+import { createLogger } from "@repo/logger";
+import {
+  type AppError,
+  AppErrorSchema,
+  ErrorCode,
+} from "@repo/contracts/error";
 
-type ResponderMultiplexer = {
-  [K in (typeof AppErrorCode)[keyof typeof AppErrorCode]]: (
-    res: Response,
-    err: BaseErrorApiResponse,
-  ) => void;
-};
-
-const errorMultiplexer: ResponderMultiplexer = {
-  [AppErrorCode.AUTHENTICATION_INVALID_AUTHENTICATION]: (
-    res: Response,
-    err: BaseErrorApiResponse,
-  ) => res.status(400).send(err),
-  [AppErrorCode.AUTHENTICATION_GENERIC_ERROR]: (
-    res: Response,
-    err: BaseErrorApiResponse,
-  ) => res.status(400).send(err),
-  [AppErrorCode.GW2_API_ERROR]: (res: Response, err: BaseErrorApiResponse) =>
-    res.status(502).send(err),
-  [AppErrorCode.GW2_ACCOUNT_INVALID_CHARACTER_LIST]: (
-    res: Response,
-    err: BaseErrorApiResponse,
-  ) => res.status(502).send(err),
-  [AppErrorCode.UNKNOWN]: (res: Response, err: BaseErrorApiResponse) =>
-    res.status(500).send(err),
-};
+const logger = createLogger({ serviceName: "api-gateway" });
 
 const errorHandler = (
-  err: BaseErrorApiResponse,
+  err: unknown,
   req: Request,
   res: Response,
-  _next: NextFunction,
+  next: NextFunction,
 ) => {
-  void _next;
-  if ("error" === err.status && err.errorCode in errorMultiplexer) {
-    return errorMultiplexer[err.errorCode](res, err);
+  if (res.headersSent) {
+    return next(err);
   }
-  req.log.fatal({ err }, "Unhandled code exception");
-  return res.status(500).send({
-    status: "error",
-    errorCode: AppErrorCode.UNKNOWN,
-    message: "An unexpected error occurred.",
-  } as BaseErrorApiResponse);
+  try {
+    const errorMessage =
+      err && typeof err === "object"
+        ? (err as FiberFailure).message
+        : String(err);
+    const appError = JSON.parse(errorMessage);
+    const safeAppError = AppErrorSchema.safeParse(appError);
+    if (safeAppError.success) {
+      logger.critical(
+        "No error responder in error multiplexer list was found for error code",
+        {
+          app_error: safeAppError.data,
+          original_error_message: (err as Error)?.message,
+          original_error_stack: (err as Error)?.stack,
+        },
+      );
+      return res.status(500).json(safeAppError.data);
+    }
+    logger.critical("Error could not be parsed as AppError", {
+      error: appError,
+      original_error_message: (err as Error)?.message,
+      original_error_stack: (err as Error)?.stack,
+    });
+    return res.status(500).json({
+      errorCode: ErrorCode.ERROR_UNKNOWN,
+      message: "An unexpected error occurred. Please try again",
+    } as AppError);
+  } catch (error) {
+    logger.critical("Unhandled, non JSON error", {
+      error_unhandled: error,
+      original_error_message: (err as Error)?.message,
+      original_error_stack: (err as Error)?.stack,
+    });
+    return res.status(500).json({
+      errorCode: ErrorCode.ERROR_UNKNOWN,
+      message: "An unexpected error occurred. Please try again",
+    } as AppError);
+  }
 };
 
 export { errorHandler };

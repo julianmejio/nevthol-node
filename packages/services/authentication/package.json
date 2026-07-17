@@ -1,0 +1,48 @@
+{
+  "name": "@repo/authentication",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "lint": "eslint --max-warnings 0",
+    "build": "tsc",
+    "test": "vitest run ."
+  },
+  "exports": {
+    "./authentication-service": {
+      "types": "./src/authenticationService.d.ts",
+      "import": "./dist/authenticationService.js"
+    },
+    "./elevation-service": {
+      "types": "./src/elevationService.d.ts",
+      "import": "./dist/elevationService.js"
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@repo/authentication-store": "workspace:*",
+    "@repo/contracts": "workspace:*",
+    "@repo/core": "workspace:*",
+    "@repo/gw2api-adapter": "workspace:*",
+    "effect": "^3.21.4",
+    "jsonwebtoken": "^9.0.3",
+    "nanoid": "^5.1.11"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/game-api": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@repo/vitest-config": "workspace:*",
+    "@tsconfig/node-ts": "^23.6.4",
+    "@tsconfig/node24": "^24.0.4",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.9.3",
+    "eslint": "catalog:",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
+  }
+}

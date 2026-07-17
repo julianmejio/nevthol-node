@@ -4,17 +4,21 @@
   "private": true,
   "description": "",
   "exports": {
+    "./bitmask": {
+      "types": "./dist/bitmask.d.ts",
+      "import": "./dist/bitmask.js"
+    },
     "./geo-coordinates": {
       "types": "./dist/geo-coordinates.d.ts",
       "import": "./dist/geo-coordinates.js"
     },
+    "./id": {
+      "types": "./dist/id.d.ts",
+      "import": "./dist/id.js"
+    },
     "./lifecycle": {
       "types": "./dist/lifecycle.d.ts",
       "import": "./dist/lifecycle.js"
-    },
-    "./bitmask": {
-      "types": "./dist/bitmask.d.ts",
-      "import": "./dist/bitmask.js"
     }
   },
   "scripts": {

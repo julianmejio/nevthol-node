@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AppErrorCode } from "../error.js";
+import { AppErrorCodeEnumSchema } from "../error.js";
 
 const BaseApiResponseSchema = z.object({
   status: z.enum(["success", "error"]),
@@ -14,7 +14,7 @@ type BaseSuccessResponse = z.infer<typeof BaseSuccessResponseSchema>;
 
 const BaseErrorApiResponseSchema = BaseApiResponseSchema.extend({
   status: z.literal("error"),
-  errorCode: z.enum(AppErrorCode),
+  errorCode: AppErrorCodeEnumSchema,
 });
 type BaseErrorApiResponse = z.infer<typeof BaseErrorApiResponseSchema>;
 

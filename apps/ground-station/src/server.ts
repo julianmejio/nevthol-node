@@ -15,7 +15,7 @@ import {
 } from "./config";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import type { IConnectionStore } from "@repo/session/connection";
-import type { AuthenticationAttributes } from "@repo/contracts/api-gateway/authentication";
+import type { AuthenticationClaimSet } from "@repo/contracts/api-gateway/authentication";
 import type { ITrailTracker } from "@repo/tracker/trail";
 import type { IUserStore } from "@repo/session/user";
 
@@ -92,7 +92,7 @@ export const createServer = ({
         const jwtVerification = jwt.verify(
           jwtToken,
           JWT_PUBLIC_KEY,
-        ) as JwtPayload & AuthenticationAttributes;
+        ) as JwtPayload & AuthenticationClaimSet;
         const connectionId = jwtVerification["jti"] as string;
         const userData: WebSocketUserData = {
           connectionId: connectionId,
