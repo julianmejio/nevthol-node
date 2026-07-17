@@ -16,12 +16,12 @@
   "license": "ISC",
   "dependencies": {
     "@repo/authentication": "workspace:*",
+    "@repo/authentication-store": "workspace:*",
     "@repo/contracts": "workspace:*",
     "@repo/game-api": "workspace:*",
     "@repo/gw2api-adapter": "workspace:*",
     "@repo/logger": "workspace:*",
     "@repo/redis-adapter": "workspace:*",
-    "@repo/authentication-store": "workspace:*",
     "cors": "^2.8.6",
     "effect": "^3.21.4",
     "express": "^5.2.1",
@@ -44,6 +44,7 @@
     "esbuild": "^0.28.1",
     "esbuild-register": "^3.6.0",
     "eslint": "catalog:",
+    "tsx": "^4.23.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8"
   }
